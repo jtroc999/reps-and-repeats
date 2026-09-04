@@ -486,7 +486,7 @@ function renderDayBody(key){
 
   if(day.type === 'cardio'){
     html += '<div class="field-lbl">How\u2019d it feel?</div>'+
-      '<div class="pill-row">'+[1,2,3,4,5].map(n=>'<div class="pill'+(log.effort===n?' sel':'')+'" onclick="setEffort(\''+day.date+'\','+n+')">'+n+'</div>').join('')+'</div>'+
+      '<div class="pill-row">'+[1,2,3,4,5].map(n=>'<div class="pill effort-pill'+(log.effort===n?' sel':'')+'" data-val="'+n+'" onclick="setEffort(\''+day.date+'\','+n+')">'+n+'</div>').join('')+'</div>'+
       '<div class="field-lbl">Distance (mi, optional)</div>'+
       '<input type="number" step="0.1" id="dist-'+key+'" value="'+(log.distance||'')+'" placeholder="e.g. 2.5">'+
       '<div class="field-lbl">Notes (optional)</div>'+
@@ -528,7 +528,9 @@ function setEffort(dateKey, n){
   log.effort = n;
   saveLog(dateKey, log);
   const key = PLAN.find(d=>d.date===dateKey).key;
-  document.querySelectorAll('#body-'+key+' .pill').forEach((el,i)=>{ el.classList.toggle('sel', i+1===n); });
+  document.querySelectorAll('#body-'+key+' .effort-pill').forEach(el=>{
+    el.classList.toggle('sel', parseInt(el.dataset.val)===n);
+  });
 }
 function finishDay(key){
   const day = PLAN.find(d=>d.key===key);
