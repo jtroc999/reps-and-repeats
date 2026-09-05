@@ -111,6 +111,19 @@ textarea{resize:vertical; min-height:52px;}
 .hist-row .l{color:var(--text2);}
 .hist-row .r{color:var(--text3); font-size:12px;}
 .version-tag{text-align:right; font-size:10px; color:var(--text3); opacity:0.5; letter-spacing:0.5px; padding:14px 2px 4px;}
+
+.modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:50; display:none; align-items:flex-end; justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal-sheet{background:var(--bg2); border:1px solid var(--border); border-bottom:none; border-radius:16px 16px 0 0; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; padding:18px 18px 28px;}
+.modal-top{display:flex; justify-content:flex-end;}
+.modal-close{width:30px; height:30px; border-radius:50%; border:1px solid var(--border2); background:var(--bg3); color:var(--text2); font-size:14px; cursor:pointer;}
+.modal-media{width:100%; min-height:180px; border-radius:10px; background:var(--bg3); border:1px solid var(--border2); display:flex; align-items:center; justify-content:center; overflow:hidden; margin-top:4px;}
+.modal-media img{width:100%; display:block;}
+.modal-media svg{width:96px; height:96px; opacity:0.8;}
+.icon-anim-hold{opacity:0.9;}
+.modal-title{font-size:19px; font-weight:700; margin:16px 0 4px;}
+.modal-meta{font-size:12px; color:var(--text3); margin-bottom:12px;}
+.modal-desc{font-size:14px; color:var(--text2); line-height:1.6;}
 </style>
 </head>
 <body>
@@ -132,8 +145,18 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.04.26.1</div>
+    <div class="version-tag">v09.04.26.6</div>
   </main>
+</div>
+
+<div class="modal-backdrop" id="ex-modal" onclick="if(event.target===this) closeExModal()">
+  <div class="modal-sheet">
+    <div class="modal-top"><button class="modal-close" onclick="closeExModal()">&#10005;</button></div>
+    <div class="modal-media" id="modal-media"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+  </div>
 </div>
 
 <script>
@@ -189,13 +212,13 @@ const PLAN = [
     items:[
       {id:'hipflex', icon:'kneel', name:'Kneeling Hip Flexor Stretch', dur:45, meta:'45 sec / side',
        desc:'Kneel on the sore-side knee, front foot flat. Shift weight forward gently until you feel a stretch at the front of the hip. Squeeze the glute on the down-knee side to deepen it.'},
-      {id:'quad', icon:'standquad', name:'Standing Quad Stretch', dur:30, meta:'30 sec / side',
+      {id:'quad', icon:'standquad', name:'Standing Quad Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1512.gif',
        desc:'Hold a wall or chair for balance, pull one heel toward your glute, knees stay close together. Stand tall — don\u2019t arch your back to get more stretch.'},
-      {id:'calf', icon:'wallcalf', name:'Wall Calf Stretch', dur:30, meta:'30 sec / side',
+      {id:'calf', icon:'wallcalf', name:'Wall Calf Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1377.gif',
        desc:'Hands on a wall, back leg straight with the heel flat on the ground, front knee bent. Lean into the wall until you feel it through the calf.'},
       {id:'itband', icon:'sidebend', name:'IT Band Side Stretch', dur:30, meta:'30 sec / side',
        desc:'Cross one leg behind the other, reach the same-side arm overhead and lean away from that side. You should feel it along the outside of the hip and thigh.'},
-      {id:'hamstring', icon:'seatreach', name:'Seated Hamstring Stretch', dur:30, meta:'30 sec / side',
+      {id:'hamstring', icon:'seatreach', name:'Seated Hamstring Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1511.gif',
        desc:'Sit with one leg extended, other foot tucked in. Hinge forward from the hips with a flat back, reaching toward the extended foot.'}
     ]},
   { key:'tue', date:'2026-09-02', label:'Tue', tag:'Gym', title:'Light upper body + core',
@@ -391,13 +414,12 @@ function exRowHtml(dateKey, item, kind){
     ctrlHtml = timerControlHtml(dateKey, item, kind, done);
   }
   return '<div class="ex-card">'+
-    '<div class="ex-row" onclick="toggleExDetail(\''+rowId+'\')">'+
+    '<div class="ex-row" onclick="openExModal(\''+dateKey+'\',\''+item.id+'\',\''+kind+'\')">'+
       '<div class="ex-icon">'+iconSvg(item.icon)+'</div>'+
       '<div class="ex-info"><div class="ex-name">'+item.name+'</div><div class="ex-meta">'+item.meta+'</div></div>'+
       '<div class="ex-row-pips" id="ctrl-'+rowId+'">'+ctrlHtml+'</div>'+
     '</div>'+
     '<div class="rest-chip" id="rest-'+rowId+'"><div><span class="rc-num" id="restnum-'+rowId+'">'+restDur+'</span>rest, then keep going</div><button class="rest-skip" onclick="event.stopPropagation();hideRestChip(\''+rowId+'\')">Skip</button></div>'+
-    '<div class="ex-detail" id="det-'+rowId+'"><div class="ex-desc">'+item.desc+'</div></div>'+
     '</div>';
 }
 
@@ -463,9 +485,41 @@ function hideRestChip(rowId){
   if(chip) chip.classList.remove('show');
 }
 
-function toggleExDetail(id){
-  const el = document.getElementById('det-'+id);
-  if(el) el.classList.toggle('open');
+// Icons for holds/stretches shouldn't animate — the stillness IS the
+// exercise. Everything else gets a gentle bob to at least suggest motion
+// until a real gifUrl is set.
+const HOLD_ICONS = new Set(['plank','sideplank','moon','kneel','standquad','wallcalf','sidebend','seatreach']);
+function iconMotionClass(iconId){ return HOLD_ICONS.has(iconId) ? 'icon-anim-hold' : 'icon-anim-move'; }
+
+function findItem(dateKey, itemId, kind){
+  if(kind==='core') return CORE.find(i=>i.id===itemId);
+  const day = PLAN.find(d=>d.date===dateKey);
+  return day ? day.items.find(i=>i.id===itemId) : null;
+}
+
+function openExModal(dateKey, itemId, kind){
+  const item = findItem(dateKey, itemId, kind);
+  if(!item) return;
+  const media = document.getElementById('modal-media');
+  media.innerHTML = '';
+  if(item.gifUrl){
+    const img = document.createElement('img');
+    img.src = item.gifUrl;
+    img.alt = item.name;
+    img.onerror = function(){
+      media.innerHTML = '<div class="'+iconMotionClass(item.icon)+'">'+iconSvg(item.icon)+'</div>';
+    };
+    media.appendChild(img);
+  } else {
+    media.innerHTML = '<div class="'+iconMotionClass(item.icon)+'">'+iconSvg(item.icon)+'</div>';
+  }
+  document.getElementById('modal-title').textContent = item.name;
+  document.getElementById('modal-meta').textContent = item.meta || '';
+  document.getElementById('modal-desc').textContent = item.desc || '';
+  document.getElementById('ex-modal').classList.add('open');
+}
+function closeExModal(){
+  document.getElementById('ex-modal').classList.remove('open');
 }
 
 function renderDayBody(key){
