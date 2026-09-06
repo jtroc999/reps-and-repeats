@@ -55,6 +55,10 @@ main{padding-top:14px;}
 .day-title{font-size:16px; font-weight:600; margin-top:2px;}
 .day-check{width:26px; height:26px; border-radius:50%; border:1.5px solid var(--border2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; color:transparent;}
 .day-check.done{background:var(--green); border-color:var(--green); color:var(--bg);}
+.day-swap{width:26px; height:26px; border-radius:50%; border:1.5px solid var(--border2); background:none; color:var(--text3); font-size:14px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+.swap-options{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
+.swap-opt{padding:12px 14px; border-radius:9px; background:var(--bg3); border:1px solid var(--border2); text-align:left; cursor:pointer; color:var(--text); font-family:inherit; font-size:14px;}
+.swap-opt .so-day{font-size:11px; color:var(--text3); letter-spacing:0.5px;}
 .day-chev{margin-left:auto; color:var(--text3); font-size:12px; transition:transform 0.2s;}
 .day-chev.open{transform:rotate(180deg);}
 .day-body{display:none; border-top:1px solid var(--border); padding:14px 15px 16px;}
@@ -145,7 +149,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.04.26.6</div>
+    <div class="version-tag">v09.05.26.1</div>
   </main>
 </div>
 
@@ -156,6 +160,15 @@ textarea{resize:vertical; min-height:52px;}
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-meta" id="modal-meta"></div>
     <div class="modal-desc" id="modal-desc"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="swap-modal" onclick="if(event.target===this) closeSwapModal()">
+  <div class="modal-sheet">
+    <div class="modal-top"><button class="modal-close" onclick="closeSwapModal()">&#10005;</button></div>
+    <div class="modal-title">Move this to which day?</div>
+    <div class="modal-meta">Swaps what's planned between the two days.</div>
+    <div class="swap-options" id="swap-options"></div>
   </div>
 </div>
 
@@ -305,8 +318,61 @@ function fmtShort(dateStr){
 function emptyLog(){ return { done:false, sets:{}, coreSets:{}, distance:'', effort:null, notes:'' }; }
 
 function init(){
+  loadPlanOverride();
   PLAN.forEach(day=>{ logs[day.date] = loadLog(day.date) || emptyLog(); });
   document.getElementById('week-range').textContent = fmtShort(PLAN[0].date)+' \u2013 '+fmtShort(PLAN[6].date);
+  renderStrip();
+  renderDays();
+  renderHistoryStats();
+}
+
+function planOverrideKey(){ return 'rr-plan-'+WEEK_START; }
+function loadPlanOverride(){
+  try{
+    const saved = localStorage.getItem(planOverrideKey());
+    if(!saved) return;
+    const parsed = JSON.parse(saved);
+    if(Array.isArray(parsed) && parsed.length === PLAN.length){
+      PLAN.splice(0, PLAN.length, ...parsed);
+    }
+  }catch(e){}
+}
+function savePlanOverride(){
+  try{ localStorage.setItem(planOverrideKey(), JSON.stringify(PLAN)); }catch(e){}
+}
+
+let swapSourceKey = null;
+function openSwapModal(key){
+  swapSourceKey = key;
+  const opts = document.getElementById('swap-options');
+  opts.innerHTML = PLAN.filter(d=>d.key!==key).map(d=>
+    '<button class="swap-opt" onclick="doSwap(\''+d.key+'\')">'+d.label+' <span class="so-day">\u2014 '+d.title+'</span></button>'
+  ).join('');
+  document.getElementById('swap-modal').classList.add('open');
+}
+function closeSwapModal(){
+  document.getElementById('swap-modal').classList.remove('open');
+  swapSourceKey = null;
+}
+function doSwap(targetKey){
+  if(swapSourceKey) swapDays(swapSourceKey, targetKey);
+  closeSwapModal();
+}
+function swapDays(keyA, keyB){
+  const idxA = PLAN.findIndex(d=>d.key===keyA);
+  const idxB = PLAN.findIndex(d=>d.key===keyB);
+  if(idxA<0 || idxB<0) return;
+  const fields = ['tag','title','type','intensity','blurb','items'];
+  const a = PLAN[idxA], b = PLAN[idxB];
+  fields.forEach(f=>{ const tmp = a[f]; a[f] = b[f]; b[f] = tmp; });
+  savePlanOverride();
+  // Whatever was logged against the old content on these two days no
+  // longer matches what's now scheduled there — start both fresh rather
+  // than show stale/mismatched checkmarks.
+  logs[a.date] = emptyLog(); saveLog(a.date, logs[a.date]);
+  logs[b.date] = emptyLog(); saveLog(b.date, logs[b.date]);
+  clearAllTimers();
+  openDay = null;
   renderStrip();
   renderDays();
   renderHistoryStats();
@@ -344,6 +410,7 @@ function renderDays(){
       '<div class="day-head" onclick="toggleDay(\''+day.key+'\')">'+
         '<div class="day-check'+(log.done?' done':'')+'">\u2713</div>'+
         '<div><div class="day-tag">'+day.label+' \u00b7 '+day.tag+'</div><div class="day-title">'+day.title+'</div></div>'+
+        '<button class="day-swap" title="Move to another day" onclick="event.stopPropagation();openSwapModal(\''+day.key+'\')">\u21c4</button>'+
         '<div class="day-chev" id="chev-'+day.key+'">\u25be</div>'+
       '</div>'+
       '<div class="day-body" id="body-'+day.key+'"></div>';
@@ -379,7 +446,7 @@ function setRestDur(n){
 }
 function restSettingsHtml(){
   return '<div class="rest-settings"><div class="field-lbl">Rest between sets</div><div class="pill-row">'+
-    [30,45,60].map(n=>'<div class="pill rest-pill'+(n===restDur?' sel':'')+'" data-val="'+n+'" onclick="setRestDur('+n+')">'+n+'s</div>').join('')+
+    [0,30,45,60].map(n=>'<div class="pill rest-pill'+(n===restDur?' sel':'')+'" data-val="'+n+'" onclick="setRestDur('+n+')">'+(n===0?'0':n+'s')+'</div>').join('')+
     '</div></div>';
 }
 
@@ -419,7 +486,7 @@ function exRowHtml(dateKey, item, kind){
       '<div class="ex-info"><div class="ex-name">'+item.name+'</div><div class="ex-meta">'+item.meta+'</div></div>'+
       '<div class="ex-row-pips" id="ctrl-'+rowId+'">'+ctrlHtml+'</div>'+
     '</div>'+
-    '<div class="rest-chip" id="rest-'+rowId+'"><div><span class="rc-num" id="restnum-'+rowId+'">'+restDur+'</span>rest, then keep going</div><button class="rest-skip" onclick="event.stopPropagation();hideRestChip(\''+rowId+'\')">Skip</button></div>'+
+    '<div class="rest-chip" id="rest-'+rowId+'"><div><span class="rc-num" id="restnum-'+rowId+'">'+restDurFor(kind)+'</span>rest, then keep going</div><button class="rest-skip" onclick="event.stopPropagation();hideRestChip(\''+rowId+'\')">Skip</button></div>'+
     '</div>';
 }
 
@@ -461,15 +528,23 @@ function completeTimedItem(dateKey, itemId, kind, rowId){
   saveLog(dateKey, log);
   const ctrl = document.getElementById('ctrl-'+rowId);
   if(ctrl) ctrl.innerHTML = '<div class="pip done">\u2713</div>';
-  showRestChip(rowId);
+  showRestChip(rowId, kind);
 }
 
-function showRestChip(rowId){
+function restDurFor(kind){
+  // The 5-Minute Plank Challenge is meant to run straight through with no
+  // rest between moves, regardless of whatever the day's rest setting is.
+  return kind === 'core' ? 0 : restDur;
+}
+
+function showRestChip(rowId, kind){
   hideRestChip(rowId);
+  const dur = restDurFor(kind);
+  if(dur <= 0) return;
   const chip = document.getElementById('rest-'+rowId);
   const numEl = document.getElementById('restnum-'+rowId);
   if(!chip) return;
-  let remaining = restDur;
+  let remaining = dur;
   if(numEl) numEl.textContent = remaining;
   chip.classList.add('show');
   const iv = setInterval(()=>{
@@ -577,7 +652,7 @@ function incSet(dateKey, itemId, maxSets, kind){
     }
     ctrl.innerHTML = pips;
   }
-  if(next>0 && next<maxSets) showRestChip(rowId); else hideRestChip(rowId);
+  if(next>0 && next<maxSets) showRestChip(rowId, kind); else hideRestChip(rowId);
 }
 function setEffort(dateKey, n){
   const log = logs[dateKey];
