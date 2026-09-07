@@ -149,7 +149,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.05.26.1</div>
+    <div class="version-tag">v09.05.26.2</div>
   </main>
 </div>
 
@@ -217,9 +217,9 @@ const CORE = [
 // ── THIS WEEK'S PLAN ─────────────────────────────────────
 // Regenerate this block each week from the actual training check-in —
 // everything else in the app (storage, icons, core block, history) stays.
-const WEEK_START = '2026-09-01';
+const WEEK_START = '2026-08-31';
 const PLAN = [
-  { key:'mon', date:'2026-09-01', label:'Mon', tag:'Recovery', title:'Mobility — hips, quads, calves',
+  { key:'mon', date:'2026-08-31', label:'Mon', tag:'Recovery', title:'Mobility — hips, quads, calves',
     type:'mobility', intensity:1,
     blurb:'Post-trip soreness in the knees, thighs and hips — this is about easing that, not adding load. No running or lifting today.',
     items:[
@@ -234,7 +234,7 @@ const PLAN = [
       {id:'hamstring', icon:'seatreach', name:'Seated Hamstring Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1511.gif',
        desc:'Sit with one leg extended, other foot tucked in. Hinge forward from the hips with a flat back, reaching toward the extended foot.'}
     ]},
-  { key:'tue', date:'2026-09-02', label:'Tue', tag:'Gym', title:'Light upper body + core',
+  { key:'tue', date:'2026-09-01', label:'Tue', tag:'Gym', title:'Light upper body + core',
     type:'strength', intensity:2,
     blurb:'Full equipment, but this is maintenance not a stimulus — drop your usual weight by 30\u201340% and stop well short of failure. No legs this week.',
     items:[
@@ -251,11 +251,11 @@ const PLAN = [
       {id:'birddog', icon:'birddog', name:'Bird Dog', sets:2, reps:'10/side', meta:'2 \u00d7 10/side',
        desc:'On all fours, extend opposite arm and leg simultaneously without letting your hips rotate. Slow and controlled — great for hip stability.'}
     ]},
-  { key:'wed', date:'2026-09-03', label:'Wed', tag:'Optional', title:'Short easy walk, or rest',
+  { key:'wed', date:'2026-09-02', label:'Wed', tag:'Optional', title:'Short easy walk, or rest',
     type:'cardio', intensity:1,
     blurb:'Let how your legs actually feel decide this one. A short easy walk is fine if things feel normal \u2014 skip it entirely if the soreness is still noticeable.',
     items:[]},
-  { key:'thu', date:'2026-09-04', label:'Thu', tag:'Gym', title:'Light upper body + core',
+  { key:'thu', date:'2026-09-03', label:'Thu', tag:'Gym', title:'Light upper body + core',
     type:'strength', intensity:2,
     blurb:'Same logic as Tuesday \u2014 light weight, no legs. Vary the order or swap an exercise if you want a little variety.',
     items:[
@@ -272,15 +272,15 @@ const PLAN = [
       {id:'birddog2', icon:'birddog', name:'Bird Dog', sets:2, reps:'10/side', meta:'2 \u00d7 10/side',
        desc:'On all fours, extend opposite arm and leg simultaneously without letting your hips rotate.'}
     ]},
-  { key:'fri', date:'2026-09-05', label:'Fri', tag:'Easy', title:'Easy walk + stretch',
+  { key:'fri', date:'2026-09-04', label:'Fri', tag:'Easy', title:'Easy walk + stretch',
     type:'cardio', intensity:1,
     blurb:'Keep it easy and short. Pair it with the same mobility stretches from Monday if your hips or calves are still tight.',
     items:[]},
-  { key:'sat', date:'2026-09-06', label:'Sat', tag:'Conditional', title:'Test run \u2014 only if soreness has eased',
+  { key:'sat', date:'2026-09-05', label:'Sat', tag:'Conditional', title:'Test run \u2014 only if soreness has eased',
     type:'cardio', intensity:2,
     blurb:'Don\u2019t force running back on a schedule. If the soreness is genuinely gone, a short easy run (Zone 1\u20132) is a fine test. If not, treat today as another mobility/rest day instead.',
     items:[]},
-  { key:'sun', date:'2026-09-07', label:'Sun', tag:'Rest', title:'Full rest',
+  { key:'sun', date:'2026-09-06', label:'Sun', tag:'Rest', title:'Full rest',
     type:'rest', intensity:0,
     blurb:'Nothing else scheduled beyond the daily core block \u2014 let the week land before the next check-in.',
     items:[]},
