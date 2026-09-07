@@ -128,6 +128,10 @@ textarea{resize:vertical; min-height:52px;}
 .modal-title{font-size:19px; font-weight:700; margin:16px 0 4px;}
 .modal-meta{font-size:12px; color:var(--text3); margin-bottom:12px;}
 .modal-desc{font-size:14px; color:var(--text2); line-height:1.6;}
+.weight-editor{display:flex; align-items:center; gap:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:10px 12px; margin-bottom:14px;}
+.weight-editor label{font-size:12px; color:var(--text3); letter-spacing:0.3px; flex-shrink:0;}
+.weight-editor input{flex:1; background:none; border:none; color:var(--ochre); font-family:'Big Shoulders Display',sans-serif; font-size:20px; text-align:right; width:100%;}
+.weight-editor .wu{color:var(--text3); font-size:13px; flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -149,7 +153,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.05.26.2</div>
+    <div class="version-tag">v09.06.26.1</div>
   </main>
 </div>
 
@@ -159,6 +163,7 @@ textarea{resize:vertical; min-height:52px;}
     <div class="modal-media" id="modal-media"></div>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-meta" id="modal-meta"></div>
+    <div id="modal-weight-area"></div>
     <div class="modal-desc" id="modal-desc"></div>
   </div>
 </div>
@@ -217,72 +222,86 @@ const CORE = [
 // ── THIS WEEK'S PLAN ─────────────────────────────────────
 // Regenerate this block each week from the actual training check-in —
 // everything else in the app (storage, icons, core block, history) stays.
-const WEEK_START = '2026-08-31';
+const WEEK_START = '2026-09-07';
 const PLAN = [
-  { key:'mon', date:'2026-08-31', label:'Mon', tag:'Recovery', title:'Mobility — hips, quads, calves',
-    type:'mobility', intensity:1,
-    blurb:'Post-trip soreness in the knees, thighs and hips — this is about easing that, not adding load. No running or lifting today.',
-    items:[
-      {id:'hipflex', icon:'kneel', name:'Kneeling Hip Flexor Stretch', dur:45, meta:'45 sec / side',
-       desc:'Kneel on the sore-side knee, front foot flat. Shift weight forward gently until you feel a stretch at the front of the hip. Squeeze the glute on the down-knee side to deepen it.'},
-      {id:'quad', icon:'standquad', name:'Standing Quad Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1512.gif',
-       desc:'Hold a wall or chair for balance, pull one heel toward your glute, knees stay close together. Stand tall — don\u2019t arch your back to get more stretch.'},
-      {id:'calf', icon:'wallcalf', name:'Wall Calf Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1377.gif',
-       desc:'Hands on a wall, back leg straight with the heel flat on the ground, front knee bent. Lean into the wall until you feel it through the calf.'},
-      {id:'itband', icon:'sidebend', name:'IT Band Side Stretch', dur:30, meta:'30 sec / side',
-       desc:'Cross one leg behind the other, reach the same-side arm overhead and lean away from that side. You should feel it along the outside of the hip and thigh.'},
-      {id:'hamstring', icon:'seatreach', name:'Seated Hamstring Stretch', dur:30, meta:'30 sec / side', gifUrl:'gifs/1511.gif',
-       desc:'Sit with one leg extended, other foot tucked in. Hinge forward from the hips with a flat back, reaching toward the extended foot.'}
-    ]},
-  { key:'tue', date:'2026-09-01', label:'Tue', tag:'Gym', title:'Light upper body + core',
-    type:'strength', intensity:2,
-    blurb:'Full equipment, but this is maintenance not a stimulus — drop your usual weight by 30\u201340% and stop well short of failure. No legs this week.',
-    items:[
-      {id:'row', icon:'row', name:'Seated Cable Row', sets:3, reps:'12', meta:'3 \u00d7 12',
-       desc:'Brace your core, pull the handle to your lower ribs while squeezing shoulder blades together. Control the return — don\u2019t let the weight stack slam.'},
-      {id:'press', icon:'press', name:'DB Shoulder Press', sets:3, reps:'10', meta:'3 \u00d7 10',
-       desc:'Press straight overhead without arching your lower back. ~30% below your normal working weight this week.'},
-      {id:'pulldown', icon:'pulldown', name:'Lat Pulldown', sets:3, reps:'12', meta:'3 \u00d7 12',
-       desc:'Pull the bar to your upper chest, lead with your elbows. Full stretch at the top, no yanking or leaning back excessively.'},
-      {id:'tricep', icon:'pushdown', name:'Cable Tricep Pushdown', sets:2, reps:'12', meta:'2 \u00d7 12',
-       desc:'Elbows pinned to your sides, extend fully without letting them flare out. Light weight, slow on the way back up.'},
-      {id:'plank', icon:'plank', name:'Plank Hold', sets:3, reps:'20\u201330 sec', meta:'3 \u00d7 20\u201330 sec',
-       desc:'Core only this week — no leg loading. Straight line from shoulders to hips, don\u2019t let your hips sag.'},
-      {id:'birddog', icon:'birddog', name:'Bird Dog', sets:2, reps:'10/side', meta:'2 \u00d7 10/side',
-       desc:'On all fours, extend opposite arm and leg simultaneously without letting your hips rotate. Slow and controlled — great for hip stability.'}
-    ]},
-  { key:'wed', date:'2026-09-02', label:'Wed', tag:'Optional', title:'Short easy walk, or rest',
-    type:'cardio', intensity:1,
-    blurb:'Let how your legs actually feel decide this one. A short easy walk is fine if things feel normal \u2014 skip it entirely if the soreness is still noticeable.',
-    items:[]},
-  { key:'thu', date:'2026-09-03', label:'Thu', tag:'Gym', title:'Light upper body + core',
-    type:'strength', intensity:2,
-    blurb:'Same logic as Tuesday \u2014 light weight, no legs. Vary the order or swap an exercise if you want a little variety.',
-    items:[
-      {id:'row2', icon:'row', name:'Seated Cable Row', sets:3, reps:'12', meta:'3 \u00d7 12',
-       desc:'Brace your core, pull the handle to your lower ribs while squeezing shoulder blades together. Control the return.'},
-      {id:'press2', icon:'press', name:'DB Shoulder Press', sets:3, reps:'10', meta:'3 \u00d7 10',
-       desc:'Press straight overhead without arching your lower back. ~30% below your normal working weight this week.'},
-      {id:'pulldown2', icon:'pulldown', name:'Lat Pulldown', sets:3, reps:'12', meta:'3 \u00d7 12',
-       desc:'Pull the bar to your upper chest, lead with your elbows. Full stretch at the top.'},
-      {id:'tricep2', icon:'pushdown', name:'Cable Tricep Pushdown', sets:2, reps:'12', meta:'2 \u00d7 12',
-       desc:'Elbows pinned to your sides, extend fully. Light weight, slow on the way back up.'},
-      {id:'plank2', icon:'plank', name:'Plank Hold', sets:3, reps:'20\u201330 sec', meta:'3 \u00d7 20\u201330 sec',
-       desc:'Core only this week \u2014 no leg loading. Straight line from shoulders to hips.'},
-      {id:'birddog2', icon:'birddog', name:'Bird Dog', sets:2, reps:'10/side', meta:'2 \u00d7 10/side',
-       desc:'On all fours, extend opposite arm and leg simultaneously without letting your hips rotate.'}
-    ]},
-  { key:'fri', date:'2026-09-04', label:'Fri', tag:'Easy', title:'Easy walk + stretch',
-    type:'cardio', intensity:1,
-    blurb:'Keep it easy and short. Pair it with the same mobility stretches from Monday if your hips or calves are still tight.',
-    items:[]},
-  { key:'sat', date:'2026-09-05', label:'Sat', tag:'Conditional', title:'Test run \u2014 only if soreness has eased',
+  { key:'mon', date:'2026-09-07', label:'Mon', tag:'Runna', title:'Easy Run \u2014 4.5mi',
     type:'cardio', intensity:2,
-    blurb:'Don\u2019t force running back on a schedule. If the soreness is genuinely gone, a short easy run (Zone 1\u20132) is a fine test. If not, treat today as another mobility/rest day instead.',
+    blurb:'5k Improvement Plan (Week 1/6). 4.5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
     items:[]},
-  { key:'sun', date:'2026-09-06', label:'Sun', tag:'Rest', title:'Full rest',
+  { key:'tue', date:'2026-09-08', label:'Tue', tag:'Gym', title:'Standing routine',
+    type:'strength', intensity:2,
+    blurb:'Your proven 8-exercise session, same order as always. Readiness has been excellent all week (PEAKING 6 days straight) \u2014 if you were already hitting the top of the rep range on any lift last time, this is a good week to bump that one up one 15 lb increment via the weight field below.',
+    items:[
+      {id:'legpress', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
+       desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
+      {id:'benchpress', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120,
+       desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
+      {id:'latpulldown', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75,
+       desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
+      {id:'legcurl', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'15/15/15', meta:'3 sets', weight:20,
+       desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
+      {id:'shoulderpress', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75,
+       desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
+      {id:'legext', icon:'row', name:'Machine Leg Extension', sets:3, reps:'15/15/15', meta:'3 sets', weight:15,
+       desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
+      {id:'kneeraise', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight',
+       desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
+      {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'15/15/15', meta:'3 sets', weight:90,
+       desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
+    ]},
+  { key:'wed', date:'2026-09-09', label:'Wed', tag:'Runna', title:'Intervals \u2014 8\u00d7400m',
+    type:'cardio', intensity:3,
+    blurb:'5k Improvement Plan (Week 1/6). 1.25mi warm-up at a conversational pace (90s walking rest), then 8 reps of 0.25mi at 6:30\u20137:00/mi with 60s walking rest between reps, then 0.75mi cool-down at a conversational pace or slower.',
+    items:[]},
+  { key:'thu', date:'2026-09-10', label:'Thu', tag:'Gym', title:'Standing routine',
+    type:'strength', intensity:2,
+    blurb:'Same session as Tuesday. If you bumped a weight Tuesday and it felt solid, keep it here too \u2014 if it felt too heavy, drop back to baseline.',
+    items:[
+      {id:'legpress2', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
+       desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
+      {id:'benchpress2', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120,
+       desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
+      {id:'latpulldown2', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75,
+       desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
+      {id:'legcurl2', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'15/15/15', meta:'3 sets', weight:20,
+       desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
+      {id:'shoulderpress2', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75,
+       desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
+      {id:'legext2', icon:'row', name:'Machine Leg Extension', sets:3, reps:'15/15/15', meta:'3 sets', weight:15,
+       desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
+      {id:'kneeraise2', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight',
+       desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
+      {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'15/15/15', meta:'3 sets', weight:90,
+       desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
+    ]},
+  { key:'fri', date:'2026-09-11', label:'Fri', tag:'Runna', title:'Easy Run \u2014 3.5mi',
+    type:'cardio', intensity:2,
+    blurb:'5k Improvement Plan (Week 1/6). 3.5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
+    items:[]},
+  { key:'sat', date:'2026-09-12', label:'Sat', tag:'Runna + Home', title:'Long Run 6.5mi + home strength',
+    type:'strength', intensity:3, logRun:true,
+    blurb:'5k Improvement Plan (Week 1/6) \u2014 Progressive Long Run: 2.5mi conversational, then 1mi each at 8:35/mi, 8:20/mi, and 7:45/mi, then 1mi conversational. Log the run below, then the home strength circuit whenever works \u2014 same day, doesn\u2019t need to be back-to-back.',
+    items:[
+      {id:'kbsquat', icon:'press', name:'Kettlebell Goblet Squat', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15,
+       desc:'Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels.'},
+      {id:'dbrdl', icon:'seatreach', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12,
+       desc:'Soft knees, hinge at the hips keeping the dumbbells close to your legs, back flat throughout. Feel it in the hamstrings, not the lower back.'},
+      {id:'kbswing', icon:'climber', name:'Kettlebell Swing', sets:3, reps:'15', meta:'3 \u00d7 15', weight:15,
+       desc:'Hinge, not squat \u2014 drive the hips forward explosively to swing the kettlebell to chest height, let it fall back naturally into the next hinge.'},
+      {id:'bandpull', icon:'row', name:'Band Pull-Apart', sets:3, reps:'15', meta:'3 \u00d7 15, band',
+       desc:'Arms extended in front at shoulder height, pull the band apart by squeezing the shoulder blades together, control the return.'},
+      {id:'glutebridge', icon:'birddog', name:'Single-Leg Glute Bridge', sets:3, reps:'12/side', meta:'3 \u00d7 12/side, bodyweight',
+       desc:'One foot planted, other leg extended, drive through the planted heel to lift the hips, squeeze at the top, lower under control.'},
+      {id:'ohtricep', icon:'pushdown', name:'Overhead Dumbbell Triceps Extension', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
+       desc:'Both hands on one dumbbell overhead, lower behind your head under control, elbows pointed forward and staying still, extend back up.'},
+      {id:'dbcurl', icon:'row', name:'Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
+       desc:'Elbows pinned to your sides, curl up without swinging the shoulders, squeeze at the top, slow negative.'},
+      {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
+       desc:'Arms fully extended at the bottom of every rep \u2014 no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang.'}
+    ]},
+  { key:'sun', date:'2026-09-13', label:'Sun', tag:'Rest', title:'Full rest',
     type:'rest', intensity:0,
-    blurb:'Nothing else scheduled beyond the daily core block \u2014 let the week land before the next check-in.',
+    blurb:'Nothing from Runna scheduled here yet. Full recovery before next week\u2019s block.',
     items:[]},
 ];
 
@@ -315,11 +334,15 @@ function todayKey(){
 function fmtShort(dateStr){
   return new Date(dateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
-function emptyLog(){ return { done:false, sets:{}, coreSets:{}, distance:'', effort:null, notes:'' }; }
+function emptyLog(){ return { done:false, sets:{}, coreSets:{}, weights:{}, distance:'', effort:null, notes:'' }; }
 
 function init(){
   loadPlanOverride();
-  PLAN.forEach(day=>{ logs[day.date] = loadLog(day.date) || emptyLog(); });
+  PLAN.forEach(day=>{
+    const log = loadLog(day.date) || emptyLog();
+    if(!log.weights) log.weights = {}; // backward-compat for logs saved before weight tracking existed
+    logs[day.date] = log;
+  });
   document.getElementById('week-range').textContent = fmtShort(PLAN[0].date)+' \u2013 '+fmtShort(PLAN[6].date);
   renderStrip();
   renderDays();
@@ -483,11 +506,21 @@ function exRowHtml(dateKey, item, kind){
   return '<div class="ex-card">'+
     '<div class="ex-row" onclick="openExModal(\''+dateKey+'\',\''+item.id+'\',\''+kind+'\')">'+
       '<div class="ex-icon">'+iconSvg(item.icon)+'</div>'+
-      '<div class="ex-info"><div class="ex-name">'+item.name+'</div><div class="ex-meta">'+item.meta+'</div></div>'+
+      '<div class="ex-info"><div class="ex-name">'+item.name+'</div><div class="ex-meta" id="meta-'+rowId+'">'+displayMeta(dateKey, item)+'</div></div>'+
       '<div class="ex-row-pips" id="ctrl-'+rowId+'">'+ctrlHtml+'</div>'+
     '</div>'+
     '<div class="rest-chip" id="rest-'+rowId+'"><div><span class="rc-num" id="restnum-'+rowId+'">'+restDurFor(kind)+'</span>rest, then keep going</div><button class="rest-skip" onclick="event.stopPropagation();hideRestChip(\''+rowId+'\')">Skip</button></div>'+
     '</div>';
+}
+
+function currentWeight(dateKey, item){
+  const log = logs[dateKey];
+  const w = log.weights ? log.weights[item.id] : undefined;
+  return (w !== undefined && w !== null && w !== '') ? w : item.weight;
+}
+function displayMeta(dateKey, item){
+  if(item.weight === undefined || item.weight === null) return item.meta;
+  return item.meta + ' @ ' + currentWeight(dateKey, item) + ' lb';
 }
 
 function startItemTimer(dateKey, itemId, dur, kind){
@@ -590,8 +623,33 @@ function openExModal(dateKey, itemId, kind){
   }
   document.getElementById('modal-title').textContent = item.name;
   document.getElementById('modal-meta').textContent = item.meta || '';
+  const weightArea = document.getElementById('modal-weight-area');
+  if(item.weight !== undefined && item.weight !== null){
+    weightArea.innerHTML = '<div class="weight-editor">'+
+      '<label>Weight used</label>'+
+      '<input type="number" inputmode="decimal" id="weight-input" value="'+currentWeight(dateKey, item)+'">'+
+      '<span class="wu">lb</span></div>';
+    const input = document.getElementById('weight-input');
+    input.onchange = function(){ saveWeight(dateKey, itemId, input.value); };
+  } else {
+    weightArea.innerHTML = '';
+  }
   document.getElementById('modal-desc').textContent = item.desc || '';
   document.getElementById('ex-modal').classList.add('open');
+}
+function saveWeight(dateKey, itemId, value){
+  const log = logs[dateKey];
+  if(!log.weights) log.weights = {};
+  const num = parseFloat(value);
+  log.weights[itemId] = isNaN(num) ? '' : num;
+  saveLog(dateKey, log);
+  // Update the row's meta text live without a full re-render
+  const day = PLAN.find(d=>d.date===dateKey);
+  const dayItem = (day && day.items ? day.items.find(i=>i.id===itemId) : null) || CORE.find(i=>i.id===itemId);
+  if(dayItem){
+    const metaEl = document.getElementById('meta-'+dateKey+'-'+itemId);
+    if(metaEl) metaEl.textContent = displayMeta(dateKey, dayItem);
+  }
 }
 function closeExModal(){
   document.getElementById('ex-modal').classList.remove('open');
@@ -615,7 +673,7 @@ function renderDayBody(key){
   html += '<div class="section-lbl">Core \u2014 5-Minute Plank Challenge</div>';
   html += CORE.map(it=>exRowHtml(day.date, it, 'core')).join('');
 
-  if(day.type === 'cardio'){
+  if(day.type === 'cardio' || day.logRun){
     html += '<div class="field-lbl">How\u2019d it feel?</div>'+
       '<div class="pill-row">'+[1,2,3,4,5].map(n=>'<div class="pill effort-pill'+(log.effort===n?' sel':'')+'" data-val="'+n+'" onclick="setEffort(\''+day.date+'\','+n+')">'+n+'</div>').join('')+'</div>'+
       '<div class="field-lbl">Distance (mi, optional)</div>'+
@@ -666,7 +724,7 @@ function setEffort(dateKey, n){
 function finishDay(key){
   const day = PLAN.find(d=>d.key===key);
   const log = logs[day.date];
-  if(day.type === 'cardio'){
+  if(day.type === 'cardio' || day.logRun){
     const distEl = document.getElementById('dist-'+key);
     const notesEl = document.getElementById('notes-'+key);
     if(distEl) log.distance = distEl.value;
