@@ -153,7 +153,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.06.26.1</div>
+    <div class="version-tag">v09.06.26.2</div>
   </main>
 </div>
 
@@ -687,11 +687,22 @@ function renderDayBody(key){
 }
 
 function doneButtonHtml(log, key, label){
+  const clearLink = '<button class="btn btn-undo" style="margin-top:6px;" onclick="clearDayLog(\''+key+'\')">Clear this day\u2019s data</button>';
   if(log.done){
     return '<div class="saved-note">Saved to your device \u2713</div>'+
-      '<button class="btn btn-undo" onclick="undoDay(\''+key+'\')">Undo</button>';
+      '<button class="btn btn-undo" onclick="undoDay(\''+key+'\')">Undo</button>'+
+      clearLink;
   }
-  return '<button class="btn btn-done" onclick="finishDay(\''+key+'\')">'+(label||'Mark day complete')+'</button>';
+  return '<button class="btn btn-done" onclick="finishDay(\''+key+'\')">'+(label||'Mark day complete')+'</button>'+
+    clearLink;
+}
+function clearDayLog(key){
+  const day = PLAN.find(d=>d.key===key);
+  if(!confirm('Clear all logged sets, weights, and notes for '+day.label+'? This can\u2019t be undone.')) return;
+  logs[day.date] = emptyLog();
+  saveLog(day.date, logs[day.date]);
+  clearAllTimers();
+  renderDayBody(key); renderStrip(); renderDays(); renderHistoryStats();
 }
 
 function incSet(dateKey, itemId, maxSets, kind){
