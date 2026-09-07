@@ -153,7 +153,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.06.26.2</div>
+    <div class="version-tag">v09.06.26.3</div>
   </main>
 </div>
 
@@ -478,7 +478,66 @@ function clearAllTimers(){
   activeTimers = {};
   Object.values(restTimers).forEach(iv=>clearInterval(iv));
   restTimers = {};
+  releaseWakeLockNow();
 }
+
+// ── AUDIO CUES ────────────────────────────────────────────
+// A short warning beep at 3 seconds left, a slightly longer two-tone
+// chime when a timer actually ends. Generated on the fly (no audio file
+// to host) — the AudioContext is created/resumed from a real tap (the
+// Start button), which satisfies the browser's autoplay-requires-a-
+// gesture rule for the beeps that fire later from the countdown itself.
+let audioCtx = null;
+function ensureAudioCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ return null; }
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  return audioCtx;
+}
+function playTone(freq, durMs, delayMs){
+  const ctx = ensureAudioCtx();
+  if(!ctx) return;
+  const start = ctx.currentTime + (delayMs||0)/1000;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.16, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + durMs/1000);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + durMs/1000 + 0.02);
+}
+function playWarningBeep(){ playTone(880, 140); }
+function playEndChime(){ playTone(880, 130); playTone(1320, 220, 150); }
+
+// ── SCREEN WAKE LOCK ──────────────────────────────────────
+// Keeps the screen from auto-locking while a timer is actively running.
+// This does NOT survive fully switching apps or manually hitting the
+// phone's lock button — that's an OS-level restriction no web page can
+// override — but it does stop the phone dimming/locking on its own
+// mid-timer, which was the actual complaint.
+let wakeLockObj = null;
+async function requestWakeLock(){
+  try{
+    if('wakeLock' in navigator){
+      wakeLockObj = await navigator.wakeLock.request('screen');
+    }
+  }catch(e){ /* not supported or denied — fail silently, not critical */ }
+}
+function releaseWakeLockNow(){
+  if(wakeLockObj){
+    wakeLockObj.release().catch(()=>{});
+    wakeLockObj = null;
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible' && Object.keys(activeTimers).length > 0){
+    requestWakeLock(); // browsers auto-release the lock when backgrounded; reacquire if a timer is still going
+  }
+});
 
 function timerControlHtml(dateKey, item, kind, done){
   if(done) return '<div class="pip done">\u2713</div>';
@@ -527,6 +586,8 @@ function startItemTimer(dateKey, itemId, dur, kind){
   const rowId = dateKey+'-'+itemId;
   if(activeTimers[rowId]) return;
   hideRestChip(rowId);
+  ensureAudioCtx();
+  requestWakeLock();
   let remaining = dur;
   const ctrl = document.getElementById('ctrl-'+rowId);
   if(!ctrl) return;
@@ -536,9 +597,11 @@ function startItemTimer(dateKey, itemId, dur, kind){
     remaining--;
     const el = document.getElementById('tnum-'+rowId);
     if(el) el.textContent = remaining;
+    if(remaining === 3) playWarningBeep();
     if(remaining<=0){
       clearInterval(iv);
       delete activeTimers[rowId];
+      playEndChime();
       completeTimedItem(dateKey, itemId, kind, rowId);
     }
   },1000);
@@ -549,6 +612,7 @@ function stopItemTimer(rowId){
   if(!t) return;
   clearInterval(t.interval);
   delete activeTimers[rowId];
+  if(Object.keys(activeTimers).length === 0) releaseWakeLockNow();
   const day = PLAN.find(d=>d.date===t.dateKey);
   const item = (t.kind==='core' ? CORE : (day ? day.items : [])).find(i=>i.id===t.itemId);
   const ctrl = document.getElementById('ctrl-'+rowId);
@@ -561,6 +625,21 @@ function completeTimedItem(dateKey, itemId, kind, rowId){
   saveLog(dateKey, log);
   const ctrl = document.getElementById('ctrl-'+rowId);
   if(ctrl) ctrl.innerHTML = '<div class="pip done">\u2713</div>';
+
+  if(kind === 'core'){
+    // Cascade straight into the next move in the 5-Minute Plank
+    // Challenge — no rest, no extra tap needed, matching how the
+    // routine is actually meant to run.
+    const idx = CORE.findIndex(i=>i.id===itemId);
+    if(idx >= 0 && idx+1 < CORE.length){
+      const next = CORE[idx+1];
+      setTimeout(()=>{ startItemTimer(dateKey, next.id, next.dur, 'core'); }, 250);
+      return; // skip the rest chip — we're chaining straight through
+    }
+    releaseWakeLockNow(); // that was the last move in the cascade
+  } else if(Object.keys(activeTimers).length === 0){
+    releaseWakeLockNow();
+  }
   showRestChip(rowId, kind);
 }
 
@@ -583,7 +662,8 @@ function showRestChip(rowId, kind){
   const iv = setInterval(()=>{
     remaining--;
     if(numEl) numEl.textContent = remaining;
-    if(remaining<=0) hideRestChip(rowId);
+    if(remaining === 3) playWarningBeep();
+    if(remaining<=0){ playEndChime(); hideRestChip(rowId); }
   },1000);
   restTimers[rowId] = iv;
 }
