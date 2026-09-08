@@ -132,6 +132,15 @@ textarea{resize:vertical; min-height:52px;}
 .weight-editor label{font-size:12px; color:var(--text3); letter-spacing:0.3px; flex-shrink:0;}
 .weight-editor input{flex:1; background:none; border:none; color:var(--ochre); font-family:'Big Shoulders Display',sans-serif; font-size:20px; text-align:right; width:100%;}
 .weight-editor .wu{color:var(--text3); font-size:13px; flex-shrink:0;}
+.reps-editor{background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:10px 12px; margin-bottom:14px;}
+.reps-editor-title{font-size:11px; color:var(--text3); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:8px;}
+.reps-set-row{display:flex; align-items:center; gap:10px; padding:6px 0; border-top:1px solid var(--border);}
+.reps-set-row:first-of-type{border-top:none;}
+.reps-set-row label{font-size:13px; color:var(--text2); flex:1;}
+.reps-set-row input{width:64px; background:var(--bg); border:1px solid var(--border2); border-radius:6px; color:var(--ochre); font-family:'Big Shoulders Display',sans-serif; font-size:18px; text-align:center; padding:4px 0;}
+.reps-set-row .target{color:var(--text3); font-size:11px;}
+.set-check{width:26px; height:26px; border-radius:6px; border:1.5px solid var(--border2); background:var(--bg); color:var(--bg); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:13px;}
+.set-check.done{background:var(--green); border-color:var(--green); color:var(--bg);}
 </style>
 </head>
 <body>
@@ -153,7 +162,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.06.26.3</div>
+    <div class="version-tag">v09.08.26.1</div>
   </main>
 </div>
 
@@ -164,6 +173,7 @@ textarea{resize:vertical; min-height:52px;}
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-meta" id="modal-meta"></div>
     <div id="modal-weight-area"></div>
+    <div id="modal-reps-area"></div>
     <div class="modal-desc" id="modal-desc"></div>
   </div>
 </div>
@@ -334,13 +344,14 @@ function todayKey(){
 function fmtShort(dateStr){
   return new Date(dateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
-function emptyLog(){ return { done:false, sets:{}, coreSets:{}, weights:{}, distance:'', effort:null, notes:'' }; }
+function emptyLog(){ return { done:false, sets:{}, coreSets:{}, weights:{}, reps:{}, distance:'', effort:null, notes:'' }; }
 
 function init(){
   loadPlanOverride();
   PLAN.forEach(day=>{
     const log = loadLog(day.date) || emptyLog();
     if(!log.weights) log.weights = {}; // backward-compat for logs saved before weight tracking existed
+    if(!log.reps) log.reps = {}; // backward-compat for logs saved before per-set rep tracking existed
     logs[day.date] = log;
   });
   document.getElementById('week-range').textContent = fmtShort(PLAN[0].date)+' \u2013 '+fmtShort(PLAN[6].date);
@@ -496,22 +507,31 @@ function ensureAudioCtx(){
   if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
   return audioCtx;
 }
-function playTone(freq, durMs, delayMs){
+function playTone(freq, durMs, delayMs, vol){
   const ctx = ensureAudioCtx();
   if(!ctx) return;
   const start = ctx.currentTime + (delayMs||0)/1000;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = 'sine';
+  osc.type = 'square'; // more harmonic content than sine — cuts through podcast audio better
   osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0.16, start);
+  gain.gain.setValueAtTime(vol||0.45, start);
   gain.gain.exponentialRampToValueAtTime(0.001, start + durMs/1000);
   osc.connect(gain); gain.connect(ctx.destination);
   osc.start(start);
   osc.stop(start + durMs/1000 + 0.02);
 }
-function playWarningBeep(){ playTone(880, 140); }
-function playEndChime(){ playTone(880, 130); playTone(1320, 220, 150); }
+// Warning: two quick beeps — distinct from the end chime's three-note
+// rising pattern, so you can tell them apart by ear without looking.
+function playWarningBeep(){
+  playTone(1100, 110, 0);
+  playTone(1100, 110, 160);
+}
+function playEndChime(){
+  playTone(880, 120, 0);
+  playTone(1100, 120, 140);
+  playTone(1400, 220, 280);
+}
 
 // ── SCREEN WAKE LOCK ──────────────────────────────────────
 // Keeps the screen from auto-locking while a timer is actively running.
@@ -544,6 +564,21 @@ function timerControlHtml(dateKey, item, kind, done){
   return '<button class="pip" onclick="event.stopPropagation();startItemTimer(\''+dateKey+'\',\''+item.id+'\','+item.dur+',\''+kind+'\')">\u25b6</button>';
 }
 
+function ensureSetArray(bucket, itemId, maxSets){
+  // Normalizes set-completion tracking to one boolean per set. Handles
+  // old saved data where this used to be a simple count (e.g. "2" meant
+  // "sets 1 and 2 done") by converting it into the equivalent array the
+  // first time it's touched.
+  let v = bucket[itemId];
+  if(!Array.isArray(v)){
+    const n = typeof v === 'number' ? v : 0;
+    v = Array(maxSets).fill(false);
+    for(let i=0; i<n && i<maxSets; i++) v[i] = true;
+    bucket[itemId] = v;
+  }
+  return v;
+}
+
 function exRowHtml(dateKey, item, kind){
   // kind: 'timed' (mobility, tap-to-start countdown), 'core' (same, daily
   // plank block), or 'sets' (strength, tap-through with rest between)
@@ -552,12 +587,7 @@ function exRowHtml(dateKey, item, kind){
   const rowId = dateKey+'-'+item.id;
   let ctrlHtml;
   if(kind==='sets'){
-    const doneCount = bucket[item.id] || 0;
-    let pips = '';
-    for(let i=1;i<=item.sets;i++){
-      pips += '<div class="pip'+(i<=doneCount?' done':'')+'" onclick="event.stopPropagation();incSet(\''+dateKey+'\',\''+item.id+'\','+item.sets+',\''+kind+'\')">'+(i<=doneCount?'\u2713':i)+'</div>';
-    }
-    ctrlHtml = pips;
+    ctrlHtml = setPipsHtml(dateKey, item, kind);
   } else {
     const done = (bucket[item.id]||0) >= 1;
     ctrlHtml = timerControlHtml(dateKey, item, kind, done);
@@ -570,6 +600,53 @@ function exRowHtml(dateKey, item, kind){
     '</div>'+
     '<div class="rest-chip" id="rest-'+rowId+'"><div><span class="rc-num" id="restnum-'+rowId+'">'+restDurFor(kind)+'</span>rest, then keep going</div><button class="rest-skip" onclick="event.stopPropagation();hideRestChip(\''+rowId+'\')">Skip</button></div>'+
     '</div>';
+}
+
+function setPipsHtml(dateKey, item, kind){
+  const log = logs[dateKey];
+  const bucket = kind==='core' ? log.coreSets : log.sets;
+  const arr = ensureSetArray(bucket, item.id, item.sets);
+  let pips = '';
+  for(let i=0; i<item.sets; i++){
+    pips += '<div class="pip'+(arr[i]?' done':'')+'" onclick="event.stopPropagation();toggleSet(\''+dateKey+'\',\''+item.id+'\','+i+','+item.sets+',\''+kind+'\')">'+(arr[i]?'\u2713':(i+1))+'</div>';
+  }
+  return pips;
+}
+
+function toggleSet(dateKey, itemId, setIndex, maxSets, kind){
+  const log = logs[dateKey];
+  const bucket = kind==='core' ? log.coreSets : log.sets;
+  const arr = ensureSetArray(bucket, itemId, maxSets);
+  arr[setIndex] = !arr[setIndex];
+  saveLog(dateKey, log);
+  refreshSetUI(dateKey, itemId, maxSets, kind);
+  const rowId = dateKey+'-'+itemId;
+  const anyDone = arr.some(Boolean);
+  const allDone = arr.every(Boolean);
+  if(anyDone && !allDone) showRestChip(rowId, kind); else hideRestChip(rowId);
+}
+
+function refreshSetUI(dateKey, itemId, maxSets, kind){
+  // Keeps the compact row's pips and the modal's set checkboxes (if that
+  // exercise's modal happens to be open) in sync with each other — you
+  // can tap either one and the other reflects it immediately.
+  const log = logs[dateKey];
+  const bucket = kind==='core' ? log.coreSets : log.sets;
+  const arr = ensureSetArray(bucket, itemId, maxSets);
+  const rowId = dateKey+'-'+itemId;
+  const ctrl = document.getElementById('ctrl-'+rowId);
+  if(ctrl){
+    let pips = '';
+    for(let i=0; i<maxSets; i++){
+      pips += '<div class="pip'+(arr[i]?' done':'')+'" onclick="event.stopPropagation();toggleSet(\''+dateKey+'\',\''+itemId+'\','+i+','+maxSets+',\''+kind+'\')">'+(arr[i]?'\u2713':(i+1))+'</div>';
+    }
+    ctrl.innerHTML = pips;
+  }
+  document.querySelectorAll('.set-check[data-item="'+itemId+'"]').forEach(chk=>{
+    const idx = parseInt(chk.dataset.set, 10);
+    chk.classList.toggle('done', !!arr[idx]);
+    chk.textContent = arr[idx] ? '\u2713' : '';
+  });
 }
 
 function currentWeight(dateKey, item){
@@ -714,9 +791,55 @@ function openExModal(dateKey, itemId, kind){
   } else {
     weightArea.innerHTML = '';
   }
+  renderSetsEditor(dateKey, itemId, item, kind);
   document.getElementById('modal-desc').textContent = item.desc || '';
   document.getElementById('ex-modal').classList.add('open');
 }
+
+function targetRepsArray(item){
+  // Parses item.reps (e.g. "20/20/25", "12", "12/side") into one target
+  // number per set. Falls back to repeating a single value, or blank
+  // placeholders if nothing numeric parses cleanly.
+  if(!item.sets) return [];
+  const nums = (item.reps || '').split('/').map(s => parseInt(s, 10)).filter(n => !isNaN(n));
+  if(nums.length === item.sets) return nums;
+  if(nums.length === 1) return Array(item.sets).fill(nums[0]);
+  return Array(item.sets).fill('');
+}
+
+function renderSetsEditor(dateKey, itemId, item, kind){
+  const area = document.getElementById('modal-reps-area');
+  if(!item.sets){ area.innerHTML = ''; return; } // timed items (mobility/core) don't have sets/reps
+  const log = logs[dateKey];
+  if(!log.reps) log.reps = {};
+  const bucket = kind==='core' ? log.coreSets : log.sets;
+  const arr = ensureSetArray(bucket, itemId, item.sets);
+  const targets = targetRepsArray(item);
+  const logged = log.reps[itemId] || [];
+  let rows = '';
+  for(let i=0; i<item.sets; i++){
+    const val = (logged[i] !== undefined && logged[i] !== null && logged[i] !== '') ? logged[i] : targets[i];
+    rows += '<div class="reps-set-row">'+
+      '<div class="set-check'+(arr[i]?' done':'')+'" data-item="'+itemId+'" data-set="'+i+'" onclick="toggleSet(\''+dateKey+'\',\''+itemId+'\','+i+','+item.sets+',\''+kind+'\')">'+(arr[i]?'\u2713':'')+'</div>'+
+      '<label>Set '+(i+1)+' <span class="target">(target '+(targets[i]!==undefined && targets[i]!=='' ? targets[i] : '\u2014')+')</span></label>'+
+      '<input type="number" inputmode="numeric" data-set="'+i+'" value="'+(val!==undefined?val:'')+'">'+
+      '</div>';
+  }
+  area.innerHTML = '<div class="reps-editor"><div class="reps-editor-title">Sets</div>'+rows+'</div>';
+  area.querySelectorAll('input').forEach(inp=>{
+    inp.onchange = function(){ saveReps(dateKey, itemId, parseInt(inp.dataset.set, 10), inp.value); };
+  });
+}
+
+function saveReps(dateKey, itemId, setIndex, value){
+  const log = logs[dateKey];
+  if(!log.reps) log.reps = {};
+  if(!log.reps[itemId]) log.reps[itemId] = [];
+  const num = parseInt(value, 10);
+  log.reps[itemId][setIndex] = isNaN(num) ? '' : num;
+  saveLog(dateKey, log);
+}
+
 function saveWeight(dateKey, itemId, value){
   const log = logs[dateKey];
   if(!log.weights) log.weights = {};
@@ -785,24 +908,6 @@ function clearDayLog(key){
   renderDayBody(key); renderStrip(); renderDays(); renderHistoryStats();
 }
 
-function incSet(dateKey, itemId, maxSets, kind){
-  const log = logs[dateKey];
-  const bucket = kind==='core' ? log.coreSets : log.sets;
-  const rowId = dateKey+'-'+itemId;
-  const next = ((bucket[itemId]||0) + 1) % (maxSets+1);
-  bucket[itemId] = next;
-  saveLog(dateKey, log);
-
-  const ctrl = document.getElementById('ctrl-'+rowId);
-  if(ctrl){
-    let pips = '';
-    for(let i=1;i<=maxSets;i++){
-      pips += '<div class="pip'+(i<=next?' done':'')+'" onclick="event.stopPropagation();incSet(\''+dateKey+'\',\''+itemId+'\','+maxSets+',\''+kind+'\')">'+(i<=next?'\u2713':i)+'</div>';
-    }
-    ctrl.innerHTML = pips;
-  }
-  if(next>0 && next<maxSets) showRestChip(rowId, kind); else hideRestChip(rowId);
-}
 function setEffort(dateKey, n){
   const log = logs[dateKey];
   log.effort = n;
