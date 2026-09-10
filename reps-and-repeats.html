@@ -118,9 +118,11 @@ textarea{resize:vertical; min-height:52px;}
 
 .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:50; display:none; align-items:flex-end; justify-content:center;}
 .modal-backdrop.open{display:flex;}
-.modal-sheet{background:var(--bg2); border:1px solid var(--border); border-bottom:none; border-radius:16px 16px 0 0; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; padding:18px 18px 28px;}
-.modal-top{display:flex; justify-content:flex-end;}
+.modal-sheet{background:var(--bg2); border:1px solid var(--border); border-bottom:none; border-radius:16px 16px 0 0; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; padding:18px 18px 28px; touch-action:pan-y;}
+.modal-top{display:flex; justify-content:space-between; align-items:center;}
 .modal-close{width:30px; height:30px; border-radius:50%; border:1px solid var(--border2); background:var(--bg3); color:var(--text2); font-size:14px; cursor:pointer;}
+.modal-nav{width:36px; height:36px; border-radius:50%; border:1px solid var(--border2); background:var(--bg3); color:var(--text); font-size:20px; cursor:pointer; line-height:1;}
+.modal-nav:disabled{opacity:0.3; cursor:default;}
 .modal-media{width:100%; min-height:180px; border-radius:10px; background:var(--bg3); border:1px solid var(--border2); display:flex; align-items:center; justify-content:center; overflow:hidden; margin-top:4px;}
 .modal-media img{width:100%; display:block;}
 .modal-media svg{width:96px; height:96px; opacity:0.8;}
@@ -128,6 +130,15 @@ textarea{resize:vertical; min-height:52px;}
 .modal-title{font-size:19px; font-weight:700; margin:16px 0 4px;}
 .modal-meta{font-size:12px; color:var(--text3); margin-bottom:12px;}
 .modal-desc{font-size:14px; color:var(--text2); line-height:1.6;}
+.modal-timer{display:flex; align-items:center; justify-content:center; gap:14px; background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:16px 12px; margin-bottom:14px;}
+.modal-timer .mt-num{font-family:'Big Shoulders Display',sans-serif; font-size:36px; color:var(--ochre);}
+.modal-timer .mt-btn{padding:10px 18px; border-radius:8px; border:none; font-family:inherit; font-weight:600; font-size:14px; cursor:pointer;}
+.modal-timer .mt-start{background:var(--ochre); color:var(--bg);}
+.modal-timer .mt-stop{background:none; border:1px solid var(--ochre); color:var(--ochre);}
+.modal-timer .mt-done{color:var(--green); font-size:15px; font-weight:600;}
+.modal-rest{display:none; align-items:center; justify-content:space-between; background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:10px 14px; margin-bottom:14px; font-size:13px; color:var(--text2);}
+.modal-rest.show{display:flex;}
+.modal-rest .mr-num{font-family:'Big Shoulders Display',sans-serif; font-size:20px; color:var(--slate); margin-right:8px;}
 .weight-editor{display:flex; align-items:center; gap:10px; background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:10px 12px; margin-bottom:14px;}
 .weight-editor label{font-size:12px; color:var(--text3); letter-spacing:0.3px; flex-shrink:0;}
 .weight-editor input{flex:1; background:none; border:none; color:var(--ochre); font-family:'Big Shoulders Display',sans-serif; font-size:20px; text-align:right; width:100%;}
@@ -162,16 +173,22 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.08.26.1</div>
+    <div class="version-tag">v09.10.26.1</div>
   </main>
 </div>
 
 <div class="modal-backdrop" id="ex-modal" onclick="if(event.target===this) closeExModal()">
-  <div class="modal-sheet">
-    <div class="modal-top"><button class="modal-close" onclick="closeExModal()">&#10005;</button></div>
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-top">
+      <button class="modal-nav" id="modal-prev" onclick="navModal(-1)">&#8249;</button>
+      <button class="modal-close" onclick="closeExModal()">&#10005;</button>
+      <button class="modal-nav" id="modal-next" onclick="navModal(1)">&#8250;</button>
+    </div>
     <div class="modal-media" id="modal-media"></div>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-meta" id="modal-meta"></div>
+    <div id="modal-timer-area"></div>
+    <div id="modal-rest-area"></div>
     <div id="modal-weight-area"></div>
     <div id="modal-reps-area"></div>
     <div class="modal-desc" id="modal-desc"></div>
@@ -468,8 +485,11 @@ function toggleDay(key){
 function openDayCard(key){ if(openDay !== key) toggleDay(key); }
 
 let restDur = parseInt(localStorage.getItem('rr-rest-dur')||'45');
-let activeTimers = {};  // rowId -> {interval, dateKey, itemId, kind}
-let restTimers = {};    // rowId -> interval
+let activeTimers = {};  // rowId -> {interval, dateKey, itemId, kind, remaining}
+let restTimers = {};    // rowId -> {interval, remaining}
+let modalCtx = null;    // {dateKey, itemId, kind} of whatever the exercise modal currently shows, or null if closed
+let navList = [];       // ordered list of {dateKey, itemId, kind} for the day's items + CORE, built when the modal opens
+let navIndex = -1;
 
 function setRestDur(n){
   restDur = n;
@@ -659,6 +679,13 @@ function displayMeta(dateKey, item){
   return item.meta + ' @ ' + currentWeight(dateKey, item) + ' lb';
 }
 
+function isModalShowing(dateKey, itemId, kind){
+  return !!modalCtx && modalCtx.dateKey===dateKey && modalCtx.itemId===itemId && modalCtx.kind===kind;
+}
+function isModalRow(rowId){
+  return !!modalCtx && (modalCtx.dateKey+'-'+modalCtx.itemId) === rowId;
+}
+
 function startItemTimer(dateKey, itemId, dur, kind){
   const rowId = dateKey+'-'+itemId;
   if(activeTimers[rowId]) return;
@@ -667,13 +694,23 @@ function startItemTimer(dateKey, itemId, dur, kind){
   requestWakeLock();
   let remaining = dur;
   const ctrl = document.getElementById('ctrl-'+rowId);
-  if(!ctrl) return;
-  ctrl.innerHTML = '<div class="timer-live"><span class="timer-num" id="tnum-'+rowId+'">'+remaining+'</span>'+
-    '<button class="timer-stop" onclick="event.stopPropagation();stopItemTimer(\''+rowId+'\')">\u25a0</button></div>';
+  // Row may not be on screen at all if this was started from the modal —
+  // that's fine, don't abort, just skip the row-specific DOM write.
+  if(ctrl){
+    ctrl.innerHTML = '<div class="timer-live"><span class="timer-num" id="tnum-'+rowId+'">'+remaining+'</span>'+
+      '<button class="timer-stop" onclick="event.stopPropagation();stopItemTimer(\''+rowId+'\')">\u25a0</button></div>';
+  }
+  activeTimers[rowId] = {interval:null, dateKey, itemId, kind, remaining};
+  if(isModalShowing(dateKey, itemId, kind)) renderModalTimer(dateKey, itemId, findItem(dateKey,itemId,kind), kind);
   const iv = setInterval(()=>{
     remaining--;
+    activeTimers[rowId].remaining = remaining;
     const el = document.getElementById('tnum-'+rowId);
     if(el) el.textContent = remaining;
+    if(isModalShowing(dateKey, itemId, kind)){
+      const mEl = document.getElementById('modal-tnum');
+      if(mEl) mEl.textContent = remaining;
+    }
     if(remaining === 3) playWarningBeep();
     if(remaining<=0){
       clearInterval(iv);
@@ -682,7 +719,7 @@ function startItemTimer(dateKey, itemId, dur, kind){
       completeTimedItem(dateKey, itemId, kind, rowId);
     }
   },1000);
-  activeTimers[rowId] = {interval:iv, dateKey, itemId, kind};
+  activeTimers[rowId].interval = iv;
 }
 function stopItemTimer(rowId){
   const t = activeTimers[rowId];
@@ -694,6 +731,7 @@ function stopItemTimer(rowId){
   const item = (t.kind==='core' ? CORE : (day ? day.items : [])).find(i=>i.id===t.itemId);
   const ctrl = document.getElementById('ctrl-'+rowId);
   if(ctrl && item) ctrl.innerHTML = timerControlHtml(t.dateKey, item, t.kind, false);
+  if(item && isModalShowing(t.dateKey, t.itemId, t.kind)) renderModalTimer(t.dateKey, t.itemId, item, t.kind);
 }
 function completeTimedItem(dateKey, itemId, kind, rowId){
   const log = logs[dateKey];
@@ -702,6 +740,11 @@ function completeTimedItem(dateKey, itemId, kind, rowId){
   saveLog(dateKey, log);
   const ctrl = document.getElementById('ctrl-'+rowId);
   if(ctrl) ctrl.innerHTML = '<div class="pip done">\u2713</div>';
+  const wasShowingThis = isModalShowing(dateKey, itemId, kind);
+  if(wasShowingThis){
+    const item = findItem(dateKey, itemId, kind);
+    if(item) renderModalTimer(dateKey, itemId, item, kind);
+  }
 
   if(kind === 'core'){
     // Cascade straight into the next move in the 5-Minute Plank
@@ -710,7 +753,17 @@ function completeTimedItem(dateKey, itemId, kind, rowId){
     const idx = CORE.findIndex(i=>i.id===itemId);
     if(idx >= 0 && idx+1 < CORE.length){
       const next = CORE[idx+1];
-      setTimeout(()=>{ startItemTimer(dateKey, next.id, next.dur, 'core'); }, 250);
+      if(wasShowingThis){
+        // Follow the cascade in the modal too, so watching it play out
+        // doesn't require swiping along with it.
+        const newIdx = navList.findIndex(e=>e.itemId===next.id && e.kind==='core');
+        if(newIdx>=0) navIndex = newIdx;
+        modalCtx = {dateKey, itemId:next.id, kind:'core'};
+      }
+      setTimeout(()=>{
+        startItemTimer(dateKey, next.id, next.dur, 'core');
+        if(wasShowingThis) renderModalContent();
+      }, 250);
       return; // skip the rest chip — we're chaining straight through
     }
     releaseWakeLockNow(); // that was the last move in the cascade
@@ -732,22 +785,29 @@ function showRestChip(rowId, kind){
   if(dur <= 0) return;
   const chip = document.getElementById('rest-'+rowId);
   const numEl = document.getElementById('restnum-'+rowId);
-  if(!chip) return;
   let remaining = dur;
   if(numEl) numEl.textContent = remaining;
-  chip.classList.add('show');
+  if(chip) chip.classList.add('show');
+  restTimers[rowId] = {interval:null, remaining};
+  if(isModalRow(rowId)) renderModalRest(rowId);
   const iv = setInterval(()=>{
     remaining--;
+    restTimers[rowId].remaining = remaining;
     if(numEl) numEl.textContent = remaining;
+    if(isModalRow(rowId)){
+      const mrEl = document.getElementById('modal-restnum');
+      if(mrEl) mrEl.textContent = remaining;
+    }
     if(remaining === 3) playWarningBeep();
     if(remaining<=0){ playEndChime(); hideRestChip(rowId); }
   },1000);
-  restTimers[rowId] = iv;
+  restTimers[rowId].interval = iv;
 }
 function hideRestChip(rowId){
-  if(restTimers[rowId]){ clearInterval(restTimers[rowId]); delete restTimers[rowId]; }
+  if(restTimers[rowId]){ clearInterval(restTimers[rowId].interval); delete restTimers[rowId]; }
   const chip = document.getElementById('rest-'+rowId);
   if(chip) chip.classList.remove('show');
+  if(isModalRow(rowId)) renderModalRest(rowId);
 }
 
 // Icons for holds/stretches shouldn't animate — the stillness IS the
@@ -762,7 +822,60 @@ function findItem(dateKey, itemId, kind){
   return day ? day.items.find(i=>i.id===itemId) : null;
 }
 
+function buildNavList(dateKey){
+  // The modal's prev/next moves through this day's exercises (if it's a
+  // mobility or strength day), followed by the daily core block — the
+  // same order the person actually works through in a session.
+  const day = PLAN.find(d=>d.date===dateKey);
+  const dayItemKind = day && day.type==='mobility' ? 'timed' : (day && day.type==='strength' ? 'sets' : null);
+  const list = [];
+  if(day && dayItemKind && day.items){
+    day.items.forEach(i => list.push({dateKey, itemId:i.id, kind:dayItemKind}));
+  }
+  CORE.forEach(i => list.push({dateKey, itemId:i.id, kind:'core'}));
+  return list;
+}
+
 function openExModal(dateKey, itemId, kind){
+  navList = buildNavList(dateKey);
+  navIndex = navList.findIndex(e => e.itemId===itemId && e.kind===kind);
+  modalCtx = {dateKey, itemId, kind};
+  renderModalContent();
+  document.getElementById('ex-modal').classList.add('open');
+  attachModalSwipe();
+}
+
+function navModal(delta){
+  const newIndex = navIndex + delta;
+  if(newIndex < 0 || newIndex >= navList.length) return; // nav buttons are disabled at the edges anyway
+  navIndex = newIndex;
+  const entry = navList[navIndex];
+  modalCtx = {dateKey:entry.dateKey, itemId:entry.itemId, kind:entry.kind};
+  renderModalContent();
+}
+
+function attachModalSwipe(){
+  const sheet = document.getElementById('modal-sheet');
+  if(sheet.dataset.swipeBound) return;
+  sheet.dataset.swipeBound = '1';
+  let startX = 0, startY = 0;
+  sheet.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+  }, {passive:true});
+  sheet.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    // Require a clearly horizontal, deliberate swipe so normal vertical
+    // scrolling through a long description never gets misread as a nav.
+    if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      navModal(dx < 0 ? 1 : -1);
+    }
+  }, {passive:true});
+}
+
+function renderModalContent(){
+  if(!modalCtx) return;
+  const {dateKey, itemId, kind} = modalCtx;
   const item = findItem(dateKey, itemId, kind);
   if(!item) return;
   const media = document.getElementById('modal-media');
@@ -780,6 +893,10 @@ function openExModal(dateKey, itemId, kind){
   }
   document.getElementById('modal-title').textContent = item.name;
   document.getElementById('modal-meta').textContent = item.meta || '';
+
+  renderModalTimer(dateKey, itemId, item, kind);
+  renderModalRest(dateKey+'-'+itemId);
+
   const weightArea = document.getElementById('modal-weight-area');
   if(item.weight !== undefined && item.weight !== null){
     weightArea.innerHTML = '<div class="weight-editor">'+
@@ -793,7 +910,45 @@ function openExModal(dateKey, itemId, kind){
   }
   renderSetsEditor(dateKey, itemId, item, kind);
   document.getElementById('modal-desc').textContent = item.desc || '';
-  document.getElementById('ex-modal').classList.add('open');
+
+  const prevBtn = document.getElementById('modal-prev');
+  const nextBtn = document.getElementById('modal-next');
+  if(prevBtn) prevBtn.disabled = navIndex <= 0;
+  if(nextBtn) nextBtn.disabled = navIndex < 0 || navIndex >= navList.length - 1;
+
+  const sheet = document.getElementById('modal-sheet');
+  if(sheet) sheet.scrollTop = 0;
+}
+
+function renderModalTimer(dateKey, itemId, item, kind){
+  const area = document.getElementById('modal-timer-area');
+  if(!area) return;
+  if(item.dur === undefined){ area.innerHTML = ''; return; } // only timed items (mobility/core) get a timer here — strength items use the Sets editor below
+  const rowId = dateKey+'-'+itemId;
+  const log = logs[dateKey];
+  const bucket = kind==='core' ? log.coreSets : log.sets;
+  const done = (bucket[itemId]||0) >= 1;
+  const active = activeTimers[rowId];
+  if(done){
+    area.innerHTML = '<div class="modal-timer"><span class="mt-done">\u2713 Done</span></div>';
+  } else if(active){
+    area.innerHTML = '<div class="modal-timer"><span class="mt-num" id="modal-tnum">'+active.remaining+'</span>'+
+      '<button class="mt-btn mt-stop" onclick="stopItemTimer(\''+rowId+'\')">Stop</button></div>';
+  } else {
+    area.innerHTML = '<div class="modal-timer"><button class="mt-btn mt-start" onclick="startItemTimer(\''+dateKey+'\',\''+itemId+'\','+item.dur+',\''+kind+'\')">\u25b6 Start ('+item.dur+'s)</button></div>';
+  }
+}
+
+function renderModalRest(rowId){
+  const area = document.getElementById('modal-rest-area');
+  if(!area) return;
+  const rt = restTimers[rowId];
+  if(rt){
+    area.innerHTML = '<div class="modal-rest show"><div><span class="mr-num" id="modal-restnum">'+rt.remaining+'</span>rest, then keep going</div>'+
+      '<button class="rest-skip" onclick="hideRestChip(\''+rowId+'\')">Skip</button></div>';
+  } else {
+    area.innerHTML = '';
+  }
 }
 
 function targetRepsArray(item){
@@ -856,6 +1011,7 @@ function saveWeight(dateKey, itemId, value){
 }
 function closeExModal(){
   document.getElementById('ex-modal').classList.remove('open');
+  modalCtx = null;
 }
 
 function renderDayBody(key){
