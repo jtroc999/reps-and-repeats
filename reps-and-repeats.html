@@ -173,7 +173,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.10.26.1</div>
+    <div class="version-tag">v09.13.26.2</div>
   </main>
 </div>
 
@@ -249,15 +249,15 @@ const CORE = [
 // ── THIS WEEK'S PLAN ─────────────────────────────────────
 // Regenerate this block each week from the actual training check-in —
 // everything else in the app (storage, icons, core block, history) stays.
-const WEEK_START = '2026-09-07';
+const WEEK_START = '2026-09-14';
 const PLAN = [
-  { key:'mon', date:'2026-09-07', label:'Mon', tag:'Runna', title:'Easy Run \u2014 4.5mi',
+  { key:'mon', date:'2026-09-14', label:'Mon', tag:'Runna', title:'Easy Run \u2014 5mi',
     type:'cardio', intensity:2,
-    blurb:'5k Improvement Plan (Week 1/6). 4.5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
+    blurb:'5k Improvement Plan (Week 2/6). 5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
     items:[]},
-  { key:'tue', date:'2026-09-08', label:'Tue', tag:'Gym', title:'Standing routine',
+  { key:'tue', date:'2026-09-15', label:'Tue', tag:'Gym', title:'Standing routine',
     type:'strength', intensity:2,
-    blurb:'Your proven 8-exercise session, same order as always. Readiness has been excellent all week (PEAKING 6 days straight) \u2014 if you were already hitting the top of the rep range on any lift last time, this is a good week to bump that one up one 15 lb increment via the weight field below.',
+    blurb:'Your Garmin set data confirmed real progress since last check: Leg Curl, Leg Extension, and Seated Row all hit the top of their rep range on every set across your last two sessions \u2014 all three bumped up one 15 lb increment (Leg Curl also corrected from 20 to the 15 lb you\u2019ve actually been using, so this bump takes it to 30). Everything else holds \u2014 mixed results session to session, not consistent enough yet.',
     items:[
       {id:'legpress', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
        desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
@@ -265,24 +265,24 @@ const PLAN = [
        desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
       {id:'latpulldown', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75,
        desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
-      {id:'legcurl', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'15/15/15', meta:'3 sets', weight:20,
+      {id:'legcurl', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
        desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
       {id:'shoulderpress', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75,
        desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
-      {id:'legext', icon:'row', name:'Machine Leg Extension', sets:3, reps:'15/15/15', meta:'3 sets', weight:15,
+      {id:'legext', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
        desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
       {id:'kneeraise', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight',
        desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
-      {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'15/15/15', meta:'3 sets', weight:90,
+      {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105,
        desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
     ]},
-  { key:'wed', date:'2026-09-09', label:'Wed', tag:'Runna', title:'Intervals \u2014 8\u00d7400m',
+  { key:'wed', date:'2026-09-16', label:'Wed', tag:'Runna', title:'Tempo \u2014 2mi',
     type:'cardio', intensity:3,
-    blurb:'5k Improvement Plan (Week 1/6). 1.25mi warm-up at a conversational pace (90s walking rest), then 8 reps of 0.25mi at 6:30\u20137:00/mi with 60s walking rest between reps, then 0.75mi cool-down at a conversational pace or slower.',
+    blurb:'5k Improvement Plan (Week 2/6). 1mi warm-up at a conversational pace (no faster than 9:05/mi), then 2mi at 7:30\u20138:00/mi with 150s walking rest, then 0.75mi cool-down at a conversational pace or slower.',
     items:[]},
-  { key:'thu', date:'2026-09-10', label:'Thu', tag:'Gym', title:'Standing routine',
+  { key:'thu', date:'2026-09-17', label:'Thu', tag:'Gym', title:'Standing routine',
     type:'strength', intensity:2,
-    blurb:'Same session as Tuesday. If you bumped a weight Tuesday and it felt solid, keep it here too \u2014 if it felt too heavy, drop back to baseline.',
+    blurb:'Same session as Tuesday, including the Leg Curl/Leg Extension/Seated Row bumps. If any of the new weights feel too heavy once you\u2019re actually under them, drop back \u2014 these were data-driven best guesses, not guarantees.',
     items:[
       {id:'legpress2', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
        desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
@@ -290,24 +290,24 @@ const PLAN = [
        desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
       {id:'latpulldown2', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75,
        desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
-      {id:'legcurl2', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'15/15/15', meta:'3 sets', weight:20,
+      {id:'legcurl2', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
        desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
       {id:'shoulderpress2', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75,
        desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
-      {id:'legext2', icon:'row', name:'Machine Leg Extension', sets:3, reps:'15/15/15', meta:'3 sets', weight:15,
+      {id:'legext2', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
        desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
       {id:'kneeraise2', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight',
        desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
-      {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'15/15/15', meta:'3 sets', weight:90,
+      {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105,
        desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
     ]},
-  { key:'fri', date:'2026-09-11', label:'Fri', tag:'Runna', title:'Easy Run \u2014 3.5mi',
+  { key:'fri', date:'2026-09-18', label:'Fri', tag:'Runna', title:'Easy Run \u2014 4.5mi',
     type:'cardio', intensity:2,
-    blurb:'5k Improvement Plan (Week 1/6). 3.5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
+    blurb:'5k Improvement Plan (Week 2/6). 4.5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
     items:[]},
-  { key:'sat', date:'2026-09-12', label:'Sat', tag:'Runna + Home', title:'Long Run 6.5mi + home strength',
+  { key:'sat', date:'2026-09-19', label:'Sat', tag:'Runna + Home', title:'Long Run 7mi + home strength',
     type:'strength', intensity:3, logRun:true,
-    blurb:'5k Improvement Plan (Week 1/6) \u2014 Progressive Long Run: 2.5mi conversational, then 1mi each at 8:35/mi, 8:20/mi, and 7:45/mi, then 1mi conversational. Log the run below, then the home strength circuit whenever works \u2014 same day, doesn\u2019t need to be back-to-back.',
+    blurb:'5k Improvement Plan (Week 2/6) \u2014 7mi at a conversational pace. Log the run below, then the home strength circuit whenever works \u2014 same day, doesn\u2019t need to be back-to-back. One change from your logged data: Dumbbell Bicep Curl hit 25 reps a set at 12 lb last time (confirmed real, not a watch glitch) \u2014 bumped to 15 lb since 12 was clearly too light. Dead-Hang Curl stays at 12 lb, matched its target exactly with no excess.',
     items:[
       {id:'kbsquat', icon:'press', name:'Kettlebell Goblet Squat', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15,
        desc:'Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels.'},
@@ -321,12 +321,12 @@ const PLAN = [
        desc:'One foot planted, other leg extended, drive through the planted heel to lift the hips, squeeze at the top, lower under control.'},
       {id:'ohtricep', icon:'pushdown', name:'Overhead Dumbbell Triceps Extension', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
        desc:'Both hands on one dumbbell overhead, lower behind your head under control, elbows pointed forward and staying still, extend back up.'},
-      {id:'dbcurl', icon:'row', name:'Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
+      {id:'dbcurl', icon:'row', name:'Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15,
        desc:'Elbows pinned to your sides, curl up without swinging the shoulders, squeeze at the top, slow negative.'},
-      {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
+      {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12,
        desc:'Arms fully extended at the bottom of every rep \u2014 no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang.'}
     ]},
-  { key:'sun', date:'2026-09-13', label:'Sun', tag:'Rest', title:'Full rest',
+  { key:'sun', date:'2026-09-20', label:'Sun', tag:'Rest', title:'Full rest',
     type:'rest', intensity:0,
     blurb:'Nothing from Runna scheduled here yet. Full recovery before next week\u2019s block.',
     items:[]},
