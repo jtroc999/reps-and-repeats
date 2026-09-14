@@ -58,6 +58,11 @@ SHEETS = {
     # but compute the real weekday from `date` when it matters rather
     # than trusting title text on faith.
     "scheduled_workouts": ["date", "title", "sportType", "workoutId", "provider", "description"],
+    # NEW: per-set weight/reps detail from Garmin's structured Strength
+    # Training logging (the watch prompts you to confirm each set) — this
+    # is what the weekly plan should read for "what did I actually lift
+    # last time" instead of relying on memory or manual reporting.
+    "exercise_sets": ["activityId", "date", "exerciseName", "setNumber", "reps", "weightLb"],
 }
 
 
@@ -128,6 +133,57 @@ def main():
     ws = get_or_create_ws(sh, "activities", SHEETS["activities"])
     n = append_new_rows(ws, SHEETS["activities"], act_rows, "activityId")
     print(f"activities: +{n} new rows")
+
+    # ---- Per-set exercise detail (weight/reps) for strength activities ----
+    # Only strength_training activities have this — the watch's structured
+    # "sets" logging feature. Weight comes back from Garmin in GRAMS,
+    # confirmed against real data (6804g = 15.0 lb kettlebell, 54431g =
+    # 120.0 lb leg press) — convert to lb for the sheet. REST entries are
+    # skipped; only ACTIVE (actually-performed) sets are kept. Exercise
+    # names are Garmin's own auto-detected labels (e.g.
+    # "SMITH_MACHINE_BENCH_PRESS" for a machine bench press) — not
+    # normalized to match the app's own exercise names here; that mapping
+    # happens by inspection when building the weekly plan, not in code,
+    # since Garmin's auto-detected name and the app's exercise name are
+    # often a close-but-not-exact match.
+    GRAMS_PER_LB = 453.59237
+    es_rows = []
+    strength_acts = [a for a in act_rows if a.get("activityType") == "strength_training"]
+    for a in strength_acts:
+        aid = a["activityId"]
+        adate = a["date"]
+        try:
+            data = api.get_activity_exercise_sets(aid)
+            set_counters = {}
+            for s in data.get("exerciseSets", []):
+                if s.get("setType") != "ACTIVE":
+                    continue
+                exercises = s.get("exercises") or []
+                ex_name = exercises[0].get("name") if exercises else "UNKNOWN"
+                set_counters[ex_name] = set_counters.get(ex_name, 0) + 1
+                weight_g = s.get("weight")
+                weight_lb = round(weight_g / GRAMS_PER_LB, 1) if weight_g and weight_g > 0 else ""
+                es_rows.append({
+                    "activityId": aid,
+                    "date": adate,
+                    "exerciseName": ex_name,
+                    "setNumber": set_counters[ex_name],
+                    "reps": s.get("repetitionCount") or "",
+                    "weightLb": weight_lb,
+                })
+        except Exception as e:
+            print(f"exercise_sets {aid}: {e}")
+
+    ws = get_or_create_ws(sh, "exercise_sets", SHEETS["exercise_sets"])
+    # Dedup key: no single column is unique per row here (same date can
+    # have many sets), so key on a composite string instead of reusing
+    # append_new_rows's single-column dedup.
+    existing = set(ws.col_values(1)[1:])  # activityId column, already-seen activities
+    new_activity_ids = {str(r["activityId"]) for r in es_rows} - existing
+    rows_to_add = [r for r in es_rows if str(r["activityId"]) in new_activity_ids]
+    if rows_to_add:
+        ws.append_rows([[r.get(h, "") for h in SHEETS["exercise_sets"]] for r in rows_to_add], value_input_option="RAW")
+    print(f"exercise_sets: +{len(rows_to_add)} new rows ({len(new_activity_ids)} new activities)")
 
     # ---- Per-day metrics (fitness age, readiness, training status, sleep, HRV) ----
     fa_rows, tr_rows, ts_rows, sl_rows, hrv_rows = [], [], [], [], []
