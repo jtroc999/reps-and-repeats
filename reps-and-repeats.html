@@ -230,6 +230,22 @@ moon:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--text3)" stroke-width="3
 };
 function iconSvg(id){ return ICONS[id] || ICONS.moon; }
 
+// ── EXERCISE MEDIA ────────────────────────────────
+// Maps an exercise's exact name to a real photo/gif in gifs/, checked in
+// the detail modal before falling back to the hand-drawn icon animation
+// above. Lives here — not in the weekly PLAN block below — so it keeps
+// matching automatically as PLAN gets regenerated week to week: add a
+// gif to gifs/ and one line here, no other changes needed. Naming
+// convention for new files: lowercase kebab-case of the exercise name
+// (e.g. "Machine Leg Curl (prone)" -> machine-leg-curl-prone.gif).
+const EXERCISE_MEDIA = {
+  'Machine Leg Press':'gifs/machine-leg-press.gif',
+  'Machine Bench/Chest Press':'gifs/machine-bench-chest-press.gif',
+  'Machine Leg Curl (prone)':'gifs/machine-leg-curl-prone.gif',
+  'Machine Shoulder Press':'gifs/machine-shoulder-press.gif',
+  'Cable Seated Row':'gifs/cable-seated-row.gif',
+};
+
 // ── DAILY CORE ADD-ON ─────────────────────────────────────
 // Appears on every day, per request — your actual "5-Minute Plank
 // Challenge" routine, tracked as its own separate activity on your watch.
@@ -880,9 +896,10 @@ function renderModalContent(){
   if(!item) return;
   const media = document.getElementById('modal-media');
   media.innerHTML = '';
-  if(item.gifUrl){
+  const mediaUrl = item.gifUrl || EXERCISE_MEDIA[item.name];
+  if(mediaUrl){
     const img = document.createElement('img');
-    img.src = item.gifUrl;
+    img.src = mediaUrl;
     img.alt = item.name;
     img.onerror = function(){
       media.innerHTML = '<div class="'+iconMotionClass(item.icon)+'">'+iconSvg(item.icon)+'</div>';
