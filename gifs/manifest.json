@@ -29,5 +29,23 @@
     "names": [
       "Cable Seated Row"
     ]
+  },
+  "machine-leg-extension": {
+    "file": "machine-leg-extension.gif",
+    "names": [
+      "Machine Leg Extension"
+    ]
+  },
+  "machine-lat-pulldown": {
+    "file": "machine-lat-pulldown.gif",
+    "names": [
+      "Machine Lat Pulldown"
+    ]
+  },
+  "hanging-knee-raise": {
+    "file": "hanging-knee-raise.gif",
+    "names": [
+      "Hanging Knee Raise"
+    ]
   }
 }
