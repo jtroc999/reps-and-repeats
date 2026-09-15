@@ -1,0 +1,33 @@
+{
+  "_readme": "Exercise gif/photo library catalog for reps-and-repeats.html (this file lives at gifs/manifest.json, distinct from the app's root-level manifest.json which is the PWA manifest). Each entry's key is the naming-convention slug (lowercase kebab-case of the exercise name); 'file' is the filename within this gifs/ folder; 'names' lists the exact item.name string(s) from the app that should use it. The app's own EXERCISE_MEDIA lookup (near the ICONS block in reps-and-repeats.html) is the copy that actually renders images and must be updated by hand to match this file when an entry is added or changed — this manifest is the human-readable source of truth / catalog, not something the app reads directly.",
+  "machine-leg-press": {
+    "file": "machine-leg-press.gif",
+    "names": [
+      "Machine Leg Press"
+    ]
+  },
+  "machine-bench-chest-press": {
+    "file": "machine-bench-chest-press.gif",
+    "names": [
+      "Machine Bench/Chest Press"
+    ]
+  },
+  "machine-leg-curl-prone": {
+    "file": "machine-leg-curl-prone.gif",
+    "names": [
+      "Machine Leg Curl (prone)"
+    ]
+  },
+  "machine-shoulder-press": {
+    "file": "machine-shoulder-press.gif",
+    "names": [
+      "Machine Shoulder Press"
+    ]
+  },
+  "cable-seated-row": {
+    "file": "cable-seated-row.gif",
+    "names": [
+      "Cable Seated Row"
+    ]
+  }
+}
