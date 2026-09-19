@@ -173,7 +173,7 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.13.26.2</div>
+    <div class="version-tag">v09.19.26.1</div>
   </main>
 </div>
 
@@ -230,38 +230,19 @@ moon:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--text3)" stroke-width="3
 };
 function iconSvg(id){ return ICONS[id] || ICONS.moon; }
 
-// ── EXERCISE MEDIA ────────────────────────────────
-// Maps an exercise's exact name to a real photo/gif in gifs/, checked in
-// the detail modal before falling back to the hand-drawn icon animation
-// above. Lives here — not in the weekly PLAN block below — so it keeps
-// matching automatically as PLAN gets regenerated week to week: add a
-// gif to gifs/ and one line here, no other changes needed. Naming
-// convention for new files: lowercase kebab-case of the exercise name
-// (e.g. "Machine Leg Curl (prone)" -> machine-leg-curl-prone.gif).
-const EXERCISE_MEDIA = {
-  'Machine Leg Press':'gifs/machine-leg-press.gif',
-  'Machine Bench/Chest Press':'gifs/machine-bench-chest-press.gif',
-  'Machine Leg Curl (prone)':'gifs/machine-leg-curl-prone.gif',
-  'Machine Shoulder Press':'gifs/machine-shoulder-press.gif',
-  'Cable Seated Row':'gifs/cable-seated-row.gif',
-  'Machine Leg Extension':'gifs/machine-leg-extension.gif',
-  'Machine Lat Pulldown':'gifs/machine-lat-pulldown.gif',
-  'Hanging Knee Raise':'gifs/hanging-knee-raise.gif',
-};
-
 // ── DAILY CORE ADD-ON ─────────────────────────────────────
 // Appears on every day, per request — your actual "5-Minute Plank
 // Challenge" routine, tracked as its own separate activity on your watch.
 const CORE = [
-  { id:'armraise', name:'Plank with Arm Raise', icon:'armraise', dur:60, meta:'1:00',
+  { id:'armraise', name:'Plank with Arm Raise', icon:'armraise', dur:60, meta:'1:00', gifUrl:'gifs/plank-arm-raise.gif',
     desc:'From a forearm or high plank, lift one arm straight out in front to shoulder height, hold briefly, alternate sides. Keep hips square — don\u2019t let them rotate as you lift.' },
-  { id:'obliquecrunch', name:'Plank with Oblique Crunch', icon:'obliquecrunch', dur:60, meta:'1:00',
+  { id:'obliquecrunch', name:'Plank with Oblique Crunch', icon:'obliquecrunch', dur:60, meta:'1:00', gifUrl:'gifs/plank-oblique-crunch.gif',
     desc:'From a high plank, drive one knee toward the same-side elbow, alternating sides. Controlled twist through the obliques, not a fast kick.' },
-  { id:'sideL', name:'Side Plank — Left', icon:'sideplank', dur:60, meta:'1:00',
+  { id:'sideL', name:'Side Plank — Left', icon:'sideplank', dur:60, meta:'1:00', gifUrl:'gifs/side-plank.gif',
     desc:'Stack your feet, prop up on one forearm, hips lifted in a straight line. Bottom hip stays up, not sagging.' },
-  { id:'sideR', name:'Side Plank — Right', icon:'sideplank', dur:60, meta:'1:00',
+  { id:'sideR', name:'Side Plank — Right', icon:'sideplank', dur:60, meta:'1:00', gifUrl:'gifs/side-plank.gif',
     desc:'Same as the left side — stacked feet, straight line from shoulder to ankle.' },
-  { id:'plank', name:'Plank', icon:'plank', dur:60, meta:'1:00',
+  { id:'plank', name:'Plank', icon:'plank', dur:60, meta:'1:00', gifUrl:'gifs/plank.gif',
     desc:'Forearms down, hips level with your shoulders — don\u2019t let them sag or pike up. Breathe steadily. The finisher — hardest to hold with tired arms, that\u2019s the point.' },
 ];
 
@@ -328,21 +309,21 @@ const PLAN = [
     type:'strength', intensity:3, logRun:true,
     blurb:'5k Improvement Plan (Week 2/6) \u2014 7mi at a conversational pace. Log the run below, then the home strength circuit whenever works \u2014 same day, doesn\u2019t need to be back-to-back. One change from your logged data: Dumbbell Bicep Curl hit 25 reps a set at 12 lb last time (confirmed real, not a watch glitch) \u2014 bumped to 15 lb since 12 was clearly too light. Dead-Hang Curl stays at 12 lb, matched its target exactly with no excess.',
     items:[
-      {id:'kbsquat', icon:'press', name:'Kettlebell Goblet Squat', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15,
+      {id:'kbsquat', icon:'press', name:'Kettlebell Goblet Squat', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15, gifUrl:'gifs/Kettlebell-goblet-squat.gif',
        desc:'Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels.'},
-      {id:'dbrdl', icon:'seatreach', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12,
+      {id:'dbrdl', icon:'seatreach', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12, gifUrl:'gifs/dumbell-romanian-deadlift.gif',
        desc:'Soft knees, hinge at the hips keeping the dumbbells close to your legs, back flat throughout. Feel it in the hamstrings, not the lower back.'},
-      {id:'kbswing', icon:'climber', name:'Kettlebell Swing', sets:3, reps:'15', meta:'3 \u00d7 15', weight:15,
+      {id:'kbswing', icon:'climber', name:'Kettlebell Swing', sets:3, reps:'15', meta:'3 \u00d7 15', weight:15, gifUrl:'gifs/Kettle_swing.gif',
        desc:'Hinge, not squat \u2014 drive the hips forward explosively to swing the kettlebell to chest height, let it fall back naturally into the next hinge.'},
-      {id:'bandpull', icon:'row', name:'Band Pull-Apart', sets:3, reps:'15', meta:'3 \u00d7 15, band',
+      {id:'bandpull', icon:'row', name:'Band Pull-Apart', sets:3, reps:'15', meta:'3 \u00d7 15, band', gifUrl:'gifs/band-pull-apart.gif',
        desc:'Arms extended in front at shoulder height, pull the band apart by squeezing the shoulder blades together, control the return.'},
-      {id:'glutebridge', icon:'birddog', name:'Single-Leg Glute Bridge', sets:3, reps:'12/side', meta:'3 \u00d7 12/side, bodyweight',
+      {id:'glutebridge', icon:'birddog', name:'Single-Leg Glute Bridge', sets:3, reps:'12/side', meta:'3 \u00d7 12/side, bodyweight', gifUrl:'gifs/glute-bridge.gif',
        desc:'One foot planted, other leg extended, drive through the planted heel to lift the hips, squeeze at the top, lower under control.'},
-      {id:'ohtricep', icon:'pushdown', name:'Overhead Dumbbell Triceps Extension', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10,
+      {id:'ohtricep', icon:'pushdown', name:'Overhead Dumbbell Triceps Extension', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10, gifUrl:'gifs/Dumbbell-Triceps-Extension.gif',
        desc:'Both hands on one dumbbell overhead, lower behind your head under control, elbows pointed forward and staying still, extend back up.'},
-      {id:'dbcurl', icon:'row', name:'Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15,
+      {id:'dbcurl', icon:'row', name:'Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15, gifUrl:'gifs/bicep-curl.gif',
        desc:'Elbows pinned to your sides, curl up without swinging the shoulders, squeeze at the top, slow negative.'},
-      {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12,
+      {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12, gifUrl:'gifs/deadhang-biceps-curl.gif',
        desc:'Arms fully extended at the bottom of every rep \u2014 no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang.'}
     ]},
   { key:'sun', date:'2026-09-20', label:'Sun', tag:'Rest', title:'Full rest',
@@ -899,10 +880,9 @@ function renderModalContent(){
   if(!item) return;
   const media = document.getElementById('modal-media');
   media.innerHTML = '';
-  const mediaUrl = item.gifUrl || EXERCISE_MEDIA[item.name];
-  if(mediaUrl){
+  if(item.gifUrl){
     const img = document.createElement('img');
-    img.src = mediaUrl;
+    img.src = item.gifUrl;
     img.alt = item.name;
     img.onerror = function(){
       media.innerHTML = '<div class="'+iconMotionClass(item.icon)+'">'+iconSvg(item.icon)+'</div>';
