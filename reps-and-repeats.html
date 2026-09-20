@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="Reps & Repeats">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#12160f">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon2-192.png?v=3">
+<link rel="apple-touch-icon" href="apple-touch-icon2.png?v=3">
 <title>Reps & Repeats — This Week</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600&display=swap');
@@ -31,7 +31,8 @@ h1,h2,h3,.num{font-family:'Big Shoulders Display',sans-serif;}
 
 header{position:sticky; top:0; z-index:20; background:var(--bg); border-bottom:1px solid var(--border); padding:16px 0 12px;}
 .eyebrow{font-size:12px; color:var(--text3); margin-bottom:2px;}
-h1{font-size:26px; font-weight:700; letter-spacing:0.3px; line-height:1;}
+h1{font-size:26px; font-weight:700; letter-spacing:0.3px; line-height:1; display:flex; align-items:center; gap:8px;}
+.title-logo{width:28px; height:28px; flex-shrink:0;}
 
 .strip{display:flex; align-items:flex-end; gap:6px; height:64px; margin-top:16px;}
 .strip-col{flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; background:none; border:none; font-family:inherit;}
@@ -115,6 +116,8 @@ textarea{resize:vertical; min-height:52px;}
 .hist-row .l{color:var(--text2);}
 .hist-row .r{color:var(--text3); font-size:12px;}
 .version-tag{text-align:right; font-size:10px; color:var(--text3); opacity:0.5; letter-spacing:0.5px; padding:14px 2px 4px;}
+.backup-row{display:flex; gap:8px; margin-top:16px;}
+.btn-backup{flex:1; padding:10px; border-radius:8px; border:1px solid var(--border2); background:var(--bg2); color:var(--text2); font-family:inherit; font-size:12px; cursor:pointer;}
 
 .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:50; display:none; align-items:flex-end; justify-content:center;}
 .modal-backdrop.open{display:flex;}
@@ -158,7 +161,7 @@ textarea{resize:vertical; min-height:52px;}
 <div class="wrap">
   <header>
     <div class="eyebrow" id="week-range">This week</div>
-    <h1>Reps &amp; Repeats</h1>
+    <h1><img src="randr2.png?v=3" alt="" class="title-logo">Reps &amp; Repeats</h1>
     <div class="strip" id="week-strip"></div>
   </header>
 
@@ -173,7 +176,12 @@ textarea{resize:vertical; min-height:52px;}
       </div>
       <div id="hist-list"></div>
     </div>
-    <div class="version-tag">v09.19.26.1</div>
+    <div class="backup-row">
+      <button class="btn-backup" onclick="backupData()">Backup my data</button>
+      <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
+      <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
+    </div>
+    <div class="version-tag">v09.20.26.1</div>
   </main>
 </div>
 
@@ -349,6 +357,49 @@ function allLogKeys(){
     if(k && k.indexOf('rr-log-')===0) keys.push(k);
   }
   return keys;
+}
+
+// ── BACKUP / RESTORE ──────────────────────────────────────
+// Everything the app stores lives in localStorage on this one device —
+// this saves a real copy to your phone's Downloads folder, independent
+// of the browser/PWA, so removing a home-screen icon or clearing site
+// data can never actually cost you anything.
+function backupData(){
+  const dump = {};
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('rr-')===0) dump[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(dump, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = 'reps-and-repeats-backup-'+stamp+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function restoreData(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const dump = JSON.parse(reader.result);
+      let count = 0;
+      Object.keys(dump).forEach(k=>{
+        if(k.indexOf('rr-')===0){ localStorage.setItem(k, dump[k]); count++; }
+      });
+      alert('Restored '+count+' saved item(s). Reloading...');
+      location.reload();
+    }catch(e){
+      alert('Could not read that backup file — it may not be a valid Reps & Repeats backup.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // allow picking the same file again later if needed
 }
 
 let logs = {};
