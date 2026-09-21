@@ -181,7 +181,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v09.20.26.1</div>
+    <div class="version-tag">v09.20.26.2</div>
   </main>
 </div>
 
@@ -257,15 +257,15 @@ const CORE = [
 // ── THIS WEEK'S PLAN ─────────────────────────────────────
 // Regenerate this block each week from the actual training check-in —
 // everything else in the app (storage, icons, core block, history) stays.
-const WEEK_START = '2026-09-14';
+const WEEK_START = '2026-09-21';
 const PLAN = [
-  { key:'mon', date:'2026-09-14', label:'Mon', tag:'Runna', title:'Easy Run \u2014 5mi',
+  { key:'mon', date:'2026-09-21', label:'Mon', tag:'Runna', title:'Easy Run \u2014 6mi',
     type:'cardio', intensity:2,
-    blurb:'5k Improvement Plan (Week 2/6). 5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
+    blurb:'5k Improvement Plan (Week 3/6). 6mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy. Mileage is stepping up this week \u2014 nothing to change on your end, just note it.',
     items:[]},
-  { key:'tue', date:'2026-09-15', label:'Tue', tag:'Gym', title:'Standing routine',
+  { key:'tue', date:'2026-09-22', label:'Tue', tag:'Gym', title:'Standing routine',
     type:'strength', intensity:2,
-    blurb:'Your Garmin set data confirmed real progress since last check: Leg Curl, Leg Extension, and Seated Row all hit the top of their rep range on every set across your last two sessions \u2014 all three bumped up one 15 lb increment (Leg Curl also corrected from 20 to the 15 lb you\u2019ve actually been using, so this bump takes it to 30). Everything else holds \u2014 mixed results session to session, not consistent enough yet.',
+    blurb:'Holding every weight where it is this week \u2014 last Thursday\u2019s session dropped off hard (Leg Press, Bench, Leg Curl, and Leg Extension all well below normal, while Lat Pulldown and Seated Row held up fine). That pattern points to real fatigue, not a bad exercise choice, likely compounding from last week\u2019s tempo run plus the fresh weight bumps. This is a week to consolidate, not push further.',
     items:[
       {id:'legpress', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
        desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
@@ -284,13 +284,13 @@ const PLAN = [
       {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105,
        desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
     ]},
-  { key:'wed', date:'2026-09-16', label:'Wed', tag:'Runna', title:'Tempo \u2014 2mi',
+  { key:'wed', date:'2026-09-23', label:'Wed', tag:'Runna', title:'Intervals \u2014 Drop Set',
     type:'cardio', intensity:3,
-    blurb:'5k Improvement Plan (Week 2/6). 1mi warm-up at a conversational pace (no faster than 9:05/mi), then 2mi at 7:30\u20138:00/mi with 150s walking rest, then 0.75mi cool-down at a conversational pace or slower.',
+    blurb:'5k Improvement Plan (Week 3/6). A ladder workout: 1.1mi warm-up (90s walking rest), then 0.75mi @ 7:25/mi, 0.62mi @ 7:15/mi, 0.5mi @ 7:00/mi, 0.37mi @ 6:55/mi, 0.25mi @ 6:45/mi, 0.12mi @ 6:30/mi \u2014 90s walking rest between each \u2014 then 0.75mi cool-down. Genuinely tougher structure than recent weeks\u2019 intervals \u2014 pace climbs as distance shrinks.',
     items:[]},
-  { key:'thu', date:'2026-09-17', label:'Thu', tag:'Gym', title:'Standing routine',
+  { key:'thu', date:'2026-09-24', label:'Thu', tag:'Gym', title:'Standing routine',
     type:'strength', intensity:2,
-    blurb:'Same session as Tuesday, including the Leg Curl/Leg Extension/Seated Row bumps. If any of the new weights feel too heavy once you\u2019re actually under them, drop back \u2014 these were data-driven best guesses, not guarantees.',
+    blurb:'Same session as Tuesday, weights held the same. Given today follows a genuinely hard interval session (harder than last week\u2019s tempo, which already coincided with a rough Thursday), it\u2019s fine to trim a set short or ease off a lift if it\u2019s not there today \u2014 no pressure to force it.',
     items:[
       {id:'legpress2', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
        desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
@@ -309,13 +309,13 @@ const PLAN = [
       {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105,
        desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
     ]},
-  { key:'fri', date:'2026-09-18', label:'Fri', tag:'Runna', title:'Easy Run \u2014 4.5mi',
+  { key:'fri', date:'2026-09-25', label:'Fri', tag:'Runna', title:'Easy Run \u2014 3.25mi',
     type:'cardio', intensity:2,
-    blurb:'5k Improvement Plan (Week 2/6). 4.5mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy.',
+    blurb:'5k Improvement Plan (Week 3/6). 3.25mi easy run at a conversational pace \u2014 no faster than 9:05/mi. Last Friday\u2019s run logged way short of plan (about 1.8mi vs 4.5mi) \u2014 worth just double-checking your watch is tracking cleanly today.',
     items:[]},
-  { key:'sat', date:'2026-09-19', label:'Sat', tag:'Runna + Home', title:'Long Run 7mi + home strength',
+  { key:'sat', date:'2026-09-26', label:'Sat', tag:'Runna + Home', title:'Long Run 8.5mi + home strength',
     type:'strength', intensity:3, logRun:true,
-    blurb:'5k Improvement Plan (Week 2/6) \u2014 7mi at a conversational pace. Log the run below, then the home strength circuit whenever works \u2014 same day, doesn\u2019t need to be back-to-back. One change from your logged data: Dumbbell Bicep Curl hit 25 reps a set at 12 lb last time (confirmed real, not a watch glitch) \u2014 bumped to 15 lb since 12 was clearly too light. Dead-Hang Curl stays at 12 lb, matched its target exactly with no excess.',
+    blurb:'5k Improvement Plan (Week 3/6) \u2014 \u201cHotspot\u201d long run: 4.5mi conversational, 1mi @ 7:35/mi, then 3mi conversational. Log the run below, then the home circuit whenever works. Weights held the same this week \u2014 last Saturday\u2019s data was solid but happened right after the run, which muddies reading it as a clean progression signal.',
     items:[
       {id:'kbsquat', icon:'press', name:'Kettlebell Goblet Squat', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15, gifUrl:'gifs/Kettlebell-goblet-squat.gif',
        desc:'Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels.'},
@@ -334,7 +334,7 @@ const PLAN = [
       {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12, gifUrl:'gifs/deadhang-biceps-curl.gif',
        desc:'Arms fully extended at the bottom of every rep \u2014 no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang.'}
     ]},
-  { key:'sun', date:'2026-09-20', label:'Sun', tag:'Rest', title:'Full rest',
+  { key:'sun', date:'2026-09-27', label:'Sun', tag:'Rest', title:'Full rest',
     type:'rest', intensity:0,
     blurb:'Nothing from Runna scheduled here yet. Full recovery before next week\u2019s block.',
     items:[]},
