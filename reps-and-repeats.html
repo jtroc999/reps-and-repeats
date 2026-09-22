@@ -181,7 +181,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v09.20.26.2</div>
+    <div class="version-tag">v09.22.26.2</div>
   </main>
 </div>
 
@@ -267,21 +267,21 @@ const PLAN = [
     type:'strength', intensity:2,
     blurb:'Holding every weight where it is this week \u2014 last Thursday\u2019s session dropped off hard (Leg Press, Bench, Leg Curl, and Leg Extension all well below normal, while Lat Pulldown and Seated Row held up fine). That pattern points to real fatigue, not a bad exercise choice, likely compounding from last week\u2019s tempo run plus the fresh weight bumps. This is a week to consolidate, not push further.',
     items:[
-      {id:'legpress', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
+      {id:'legpress', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120, gifUrl:'gifs/machine-leg-press.gif',
        desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
-      {id:'benchpress', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120,
+      {id:'benchpress', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120, gifUrl:'gifs/machine-bench-chest-press.gif',
        desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
-      {id:'latpulldown', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75,
+      {id:'latpulldown', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75, gifUrl:'gifs/machine-lat-pulldown.gif',
        desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
-      {id:'legcurl', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
+      {id:'legcurl', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-curl-prone.gif',
        desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
-      {id:'shoulderpress', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75,
+      {id:'shoulderpress', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75, gifUrl:'gifs/machine-shoulder-press.gif',
        desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
-      {id:'legext', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
+      {id:'legext', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-extension.gif',
        desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
-      {id:'kneeraise', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight',
+      {id:'kneeraise', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight', gifUrl:'gifs/hanging-knee-raise.gif',
        desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
-      {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105,
+      {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105, gifUrl:'gifs/cable-seated-row.gif',
        desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
     ]},
   { key:'wed', date:'2026-09-23', label:'Wed', tag:'Runna', title:'Intervals \u2014 Drop Set',
@@ -292,21 +292,21 @@ const PLAN = [
     type:'strength', intensity:2,
     blurb:'Same session as Tuesday, weights held the same. Given today follows a genuinely hard interval session (harder than last week\u2019s tempo, which already coincided with a rough Thursday), it\u2019s fine to trim a set short or ease off a lift if it\u2019s not there today \u2014 no pressure to force it.',
     items:[
-      {id:'legpress2', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120,
+      {id:'legpress2', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120, gifUrl:'gifs/machine-leg-press.gif',
        desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
-      {id:'benchpress2', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120,
+      {id:'benchpress2', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120, gifUrl:'gifs/machine-bench-chest-press.gif',
        desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
-      {id:'latpulldown2', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75,
+      {id:'latpulldown2', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75, gifUrl:'gifs/machine-lat-pulldown.gif',
        desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
-      {id:'legcurl2', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
+      {id:'legcurl2', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-curl-prone.gif',
        desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
-      {id:'shoulderpress2', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75,
+      {id:'shoulderpress2', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75, gifUrl:'gifs/machine-shoulder-press.gif',
        desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
-      {id:'legext2', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30,
+      {id:'legext2', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-extension.gif',
        desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
-      {id:'kneeraise2', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight',
+      {id:'kneeraise2', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight', gifUrl:'gifs/hanging-knee-raise.gif',
        desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
-      {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105,
+      {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105, gifUrl:'gifs/cable-seated-row.gif',
        desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
     ]},
   { key:'fri', date:'2026-09-25', label:'Fri', tag:'Runna', title:'Easy Run \u2014 3.25mi',
@@ -693,8 +693,9 @@ function toggleSet(dateKey, itemId, setIndex, maxSets, kind){
   refreshSetUI(dateKey, itemId, maxSets, kind);
   const rowId = dateKey+'-'+itemId;
   const anyDone = arr.some(Boolean);
-  const allDone = arr.every(Boolean);
-  if(anyDone && !allDone) showRestChip(rowId, kind); else hideRestChip(rowId);
+  // Rest shows after every completed set now, including the last one —
+  // that final rest doubles as the gap before starting the next exercise.
+  if(anyDone) showRestChip(rowId, kind); else hideRestChip(rowId);
 }
 
 function refreshSetUI(dateKey, itemId, maxSets, kind){
