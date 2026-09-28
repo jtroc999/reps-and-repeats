@@ -60,6 +60,7 @@ main{padding-top:14px;}
 .swap-options{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
 .swap-opt{padding:12px 14px; border-radius:9px; background:var(--bg3); border:1px solid var(--border2); text-align:left; cursor:pointer; color:var(--text); font-family:inherit; font-size:14px;}
 .swap-opt .so-day{font-size:11px; color:var(--text3); letter-spacing:0.5px;}
+.day-head-main{flex:1; min-width:0;}
 .day-chev{margin-left:auto; color:var(--text3); font-size:12px; transition:transform 0.2s;}
 .day-chev.open{transform:rotate(180deg);}
 .day-body{display:none; border-top:1px solid var(--border); padding:14px 15px 16px;}
@@ -155,6 +156,15 @@ textarea{resize:vertical; min-height:52px;}
 .reps-set-row .target{color:var(--text3); font-size:11px;}
 .set-check{width:26px; height:26px; border-radius:6px; border:1.5px solid var(--border2); background:var(--bg); color:var(--bg); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:13px;}
 .set-check.done{background:var(--green); border-color:var(--green); color:var(--bg);}
+.modal-top > .modal-close:only-child{margin-left:auto;}
+.part-head{display:flex; align-items:center; justify-content:space-between; margin:16px 0 6px;}
+.part-head:first-child{margin-top:0;}
+.part-lbl{font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3);}
+.part-move{font-family:inherit; font-size:12px; color:var(--text2); background:none; border:1px solid var(--border2); border-radius:14px; padding:4px 11px; cursor:pointer;}
+.swap-opt .so-out{font-size:11px; margin-top:4px; color:var(--text3);}
+.swap-opt .so-out.swap{color:var(--ochre);}
+.toast{position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--border2); color:var(--text); padding:10px 16px; border-radius:9px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:60; max-width:88%; text-align:center;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -181,7 +191,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v09.22.26.2</div>
+    <div class="version-tag">v09.27.26.2</div>
   </main>
 </div>
 
@@ -209,6 +219,15 @@ textarea{resize:vertical; min-height:52px;}
     <div class="modal-title">Move this to which day?</div>
     <div class="modal-meta">Swaps what's planned between the two days.</div>
     <div class="swap-options" id="swap-options"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="move-modal" onclick="if(event.target===this) closeMoveModal()">
+  <div class="modal-sheet">
+    <div class="modal-top"><button class="modal-close" onclick="closeMoveModal()">&#10005;</button></div>
+    <div class="modal-title" id="move-title"></div>
+    <div class="modal-meta" id="move-sub"></div>
+    <div class="swap-options" id="move-options"></div>
   </div>
 </div>
 
@@ -257,87 +276,60 @@ const CORE = [
 // ── THIS WEEK'S PLAN ─────────────────────────────────────
 // Regenerate this block each week from the actual training check-in —
 // everything else in the app (storage, icons, core block, history) stays.
-const WEEK_START = '2026-09-21';
+// A day is made of up to two movable parts: `run` and `strength`. Title,
+// tag, type, items and the run-log fields are all DERIVED from them by
+// deriveDay() — never set those by hand.
+const WEEK_START = '2026-09-28';
 const PLAN = [
-  { key:'mon', date:'2026-09-21', label:'Mon', tag:'Runna', title:'Easy Run \u2014 6mi',
-    type:'cardio', intensity:2,
-    blurb:'5k Improvement Plan (Week 3/6). 6mi easy run at a conversational pace \u2014 no faster than 9:05/mi. This is a limit, not a target: run at whatever pace feels truly easy. Mileage is stepping up this week \u2014 nothing to change on your end, just note it.',
-    items:[]},
-  { key:'tue', date:'2026-09-22', label:'Tue', tag:'Gym', title:'Standing routine',
-    type:'strength', intensity:2,
-    blurb:'Holding every weight where it is this week \u2014 last Thursday\u2019s session dropped off hard (Leg Press, Bench, Leg Curl, and Leg Extension all well below normal, while Lat Pulldown and Seated Row held up fine). That pattern points to real fatigue, not a bad exercise choice, likely compounding from last week\u2019s tempo run plus the fresh weight bumps. This is a week to consolidate, not push further.',
-    items:[
-      {id:'legpress', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120, gifUrl:'gifs/machine-leg-press.gif',
-       desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
-      {id:'benchpress', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120, gifUrl:'gifs/machine-bench-chest-press.gif',
-       desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
-      {id:'latpulldown', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75, gifUrl:'gifs/machine-lat-pulldown.gif',
-       desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
-      {id:'legcurl', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-curl-prone.gif',
-       desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
-      {id:'shoulderpress', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75, gifUrl:'gifs/machine-shoulder-press.gif',
-       desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
-      {id:'legext', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-extension.gif',
-       desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
-      {id:'kneeraise', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight', gifUrl:'gifs/hanging-knee-raise.gif',
-       desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
-      {id:'seatedrow', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105, gifUrl:'gifs/cable-seated-row.gif',
-       desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
-    ]},
-  { key:'wed', date:'2026-09-23', label:'Wed', tag:'Runna', title:'Intervals \u2014 Drop Set',
-    type:'cardio', intensity:3,
-    blurb:'5k Improvement Plan (Week 3/6). A ladder workout: 1.1mi warm-up (90s walking rest), then 0.75mi @ 7:25/mi, 0.62mi @ 7:15/mi, 0.5mi @ 7:00/mi, 0.37mi @ 6:55/mi, 0.25mi @ 6:45/mi, 0.12mi @ 6:30/mi \u2014 90s walking rest between each \u2014 then 0.75mi cool-down. Genuinely tougher structure than recent weeks\u2019 intervals \u2014 pace climbs as distance shrinks.',
-    items:[]},
-  { key:'thu', date:'2026-09-24', label:'Thu', tag:'Gym', title:'Standing routine',
-    type:'strength', intensity:2,
-    blurb:'Same session as Tuesday, weights held the same. Given today follows a genuinely hard interval session (harder than last week\u2019s tempo, which already coincided with a rough Thursday), it\u2019s fine to trim a set short or ease off a lift if it\u2019s not there today \u2014 no pressure to force it.',
-    items:[
-      {id:'legpress2', icon:'press', name:'Machine Leg Press', sets:3, reps:'20/20/25', meta:'3 sets', weight:120, gifUrl:'gifs/machine-leg-press.gif',
-       desc:'Feet shoulder-width on the plate, release the safety, lower to about 90\u00b0 at the knee, drive through the heels back up.'},
-      {id:'benchpress2', icon:'press', name:'Machine Bench/Chest Press', sets:3, reps:'10/8/8', meta:'3 sets', weight:120, gifUrl:'gifs/machine-bench-chest-press.gif',
-       desc:'Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level.'},
-      {id:'latpulldown2', icon:'pulldown', name:'Machine Lat Pulldown', sets:3, reps:'15/15/10', meta:'3 sets', weight:75, gifUrl:'gifs/machine-lat-pulldown.gif',
-       desc:'Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return.'},
-      {id:'legcurl2', icon:'row', name:'Machine Leg Curl (prone)', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-curl-prone.gif',
-       desc:'Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release.'},
-      {id:'shoulderpress2', icon:'press', name:'Machine Shoulder Press', sets:3, reps:'15/12/12', meta:'3 sets', weight:75, gifUrl:'gifs/machine-shoulder-press.gif',
-       desc:'Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level.'},
-      {id:'legext2', icon:'row', name:'Machine Leg Extension', sets:3, reps:'12/12/12', meta:'3 sets', weight:30, gifUrl:'gifs/machine-leg-extension.gif',
-       desc:'Back pad set so knees line up with the machine\u2019s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower.'},
-      {id:'kneeraise2', icon:'birddog', name:'Hanging Knee Raise', sets:3, reps:'15/15/15', meta:'3 \u00d7 15, bodyweight', gifUrl:'gifs/hanging-knee-raise.gif',
-       desc:'Hang from the bar, raise your knees toward your chest under control \u2014 no swinging. Lower slowly back to a dead hang.'},
-      {id:'seatedrow2', icon:'row', name:'Cable Seated Row', sets:3, reps:'12/12/12', meta:'3 sets', weight:105, gifUrl:'gifs/cable-seated-row.gif',
-       desc:'Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return.'}
-    ]},
-  { key:'fri', date:'2026-09-25', label:'Fri', tag:'Runna', title:'Easy Run \u2014 3.25mi',
-    type:'cardio', intensity:2,
-    blurb:'5k Improvement Plan (Week 3/6). 3.25mi easy run at a conversational pace \u2014 no faster than 9:05/mi. Last Friday\u2019s run logged way short of plan (about 1.8mi vs 4.5mi) \u2014 worth just double-checking your watch is tracking cleanly today.',
-    items:[]},
-  { key:'sat', date:'2026-09-26', label:'Sat', tag:'Runna + Home', title:'Long Run 8.5mi + home strength',
-    type:'strength', intensity:3, logRun:true,
-    blurb:'5k Improvement Plan (Week 3/6) \u2014 \u201cHotspot\u201d long run: 4.5mi conversational, 1mi @ 7:35/mi, then 3mi conversational. Log the run below, then the home circuit whenever works. Weights held the same this week \u2014 last Saturday\u2019s data was solid but happened right after the run, which muddies reading it as a clean progression signal.',
-    items:[
-      {id:'kbsquat', icon:'press', name:'Kettlebell Goblet Squat', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15, gifUrl:'gifs/Kettlebell-goblet-squat.gif',
-       desc:'Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels.'},
-      {id:'dbrdl', icon:'seatreach', name:'Dumbbell Romanian Deadlift', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12, gifUrl:'gifs/dumbell-romanian-deadlift.gif',
-       desc:'Soft knees, hinge at the hips keeping the dumbbells close to your legs, back flat throughout. Feel it in the hamstrings, not the lower back.'},
-      {id:'kbswing', icon:'climber', name:'Kettlebell Swing', sets:3, reps:'15', meta:'3 \u00d7 15', weight:15, gifUrl:'gifs/Kettle_swing.gif',
-       desc:'Hinge, not squat \u2014 drive the hips forward explosively to swing the kettlebell to chest height, let it fall back naturally into the next hinge.'},
-      {id:'bandpull', icon:'row', name:'Band Pull-Apart', sets:3, reps:'15', meta:'3 \u00d7 15, band', gifUrl:'gifs/band-pull-apart.gif',
-       desc:'Arms extended in front at shoulder height, pull the band apart by squeezing the shoulder blades together, control the return.'},
-      {id:'glutebridge', icon:'birddog', name:'Single-Leg Glute Bridge', sets:3, reps:'12/side', meta:'3 \u00d7 12/side, bodyweight', gifUrl:'gifs/glute-bridge.gif',
-       desc:'One foot planted, other leg extended, drive through the planted heel to lift the hips, squeeze at the top, lower under control.'},
-      {id:'ohtricep', icon:'pushdown', name:'Overhead Dumbbell Triceps Extension', sets:3, reps:'12', meta:'3 \u00d7 12', weight:10, gifUrl:'gifs/Dumbbell-Triceps-Extension.gif',
-       desc:'Both hands on one dumbbell overhead, lower behind your head under control, elbows pointed forward and staying still, extend back up.'},
-      {id:'dbcurl', icon:'row', name:'Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:15, gifUrl:'gifs/bicep-curl.gif',
-       desc:'Elbows pinned to your sides, curl up without swinging the shoulders, squeeze at the top, slow negative.'},
-      {id:'deadhangcurl', icon:'row', name:'Dead-Hang Dumbbell Bicep Curl', sets:3, reps:'12', meta:'3 \u00d7 12', weight:12, gifUrl:'gifs/deadhang-biceps-curl.gif',
-       desc:'Arms fully extended at the bottom of every rep \u2014 no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang.'}
-    ]},
-  { key:'sun', date:'2026-09-27', label:'Sun', tag:'Rest', title:'Full rest',
-    type:'rest', intensity:0,
-    blurb:'Nothing from Runna scheduled here yet. Full recovery before next week\u2019s block.',
-    items:[]},
+  { key:'mon', date:'2026-09-28', label:'Mon',
+    run: {"tag":"Runna","title":"Easy Run — 5mi","intensity":2,"blurb":"5k Improvement Plan (Week 4/6). 5mi easy run at a conversational pace — no faster than 9:00/mi (Runna tightened the limit slightly from 9:05). This is a limit, not a target: run at whatever pace feels truly easy. Garmin flagged STRAINED the last two days after your biggest running week yet, so let today’s effort be genuinely easy."},
+    strength: null },
+  { key:'tue', date:'2026-09-29', label:'Tue',
+    run: null,
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Both gym sessions last week landed exactly on target across all 8 lifts, so last Thursday’s dip was a one-off. Leg Curl, Leg Extension, and Seated Row have each cleared 12/12/12 cleanly on two sessions at their new weights — stepping each up one rep per set (13/13/13). Reps climb first; hitting 15 on every set is what triggers the next weight bump. Everything else holds. If your legs feel heavy after Monday’s run, stay at 12s today.","items":[
+        {"id":"legpress","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
+        {"id":"benchpress","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
+        {"id":"latpulldown","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
+        {"id":"legcurl","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
+        {"id":"shoulderpress","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
+        {"id":"legext","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"kneeraise","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
+        {"id":"seatedrow","icon":"row","name":"Cable Seated Row","sets":3,"reps":"13/13/13","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
+      ]} },
+  { key:'wed', date:'2026-09-30', label:'Wed',
+    run: {"tag":"Runna","title":"Intervals — Pyramid","intensity":3,"blurb":"5k Improvement Plan (Week 4/6) — 4.9mi total. 1.5mi warm-up at a conversational pace (no faster than 9:00/mi), 90s walking rest. Then the pyramid: 0.12mi @ 6:20/mi (60s walk), 0.25mi @ 6:30/mi (90s walk), 0.5mi @ 7:00/mi (90s walk), 0.75mi @ 7:15/mi (120s walk), then back down: 0.5mi @ 7:00/mi (90s walk), 0.25mi @ 6:30/mi (90s walk), 0.12mi @ 6:20/mi (60s walk). Finish with a 0.9mi cool-down at a conversational pace or slower."},
+    strength: null },
+  { key:'thu', date:'2026-10-01', label:'Thu',
+    run: null,
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Same session as Tuesday, including the one-rep bumps on Leg Curl, Leg Extension, and Seated Row. It follows Wednesday’s pyramid intervals, so if your legs are cooked, it’s fine to stay at 12s or trim a set — no pressure to force it.","items":[
+        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
+        {"id":"benchpress2","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
+        {"id":"latpulldown2","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
+        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
+        {"id":"shoulderpress2","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
+        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"kneeraise2","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
+        {"id":"seatedrow2","icon":"row","name":"Cable Seated Row","sets":3,"reps":"13/13/13","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
+      ]} },
+  { key:'fri', date:'2026-10-02', label:'Fri',
+    run: {"tag":"Runna","title":"Easy Run — 3.75mi","intensity":2,"blurb":"5k Improvement Plan (Week 4/6). 3.75mi easy run at a conversational pace — no faster than 9:00/mi. This is a limit, not a target: run at whatever pace feels truly easy."},
+    strength: null },
+  { key:'sat', date:'2026-10-03', label:'Sat',
+    run: {"tag":"Runna","title":"Long Run 9.5mi","intensity":3,"blurb":"5k Improvement Plan (Week 4/6) — 9.5mi at a conversational pace, the longest run of the plan. Log effort, distance, and notes at the bottom of this card."},
+    strength: {"kind":"strength","tag":"Home","title":"Home strength","intensity":2,"blurb":"Home circuit — do it whenever works, or use Move to shift it to another day. One change from your logged data: Dumbbell Bicep Curl went 20/20/20 at 15 lb last Saturday against a target of 12, so the target now matches what you’re actually doing (3 × 20). Everything else in the circuit held its target exactly — no changes.","items":[
+        {"id":"kbsquat","icon":"press","name":"Kettlebell Goblet Squat","sets":3,"reps":"12","meta":"3 × 12","weight":15,"gifUrl":"gifs/Kettlebell-goblet-squat.gif","desc":"Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels."},
+        {"id":"dbrdl","icon":"seatreach","name":"Dumbbell Romanian Deadlift","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/dumbell-romanian-deadlift.gif","desc":"Soft knees, hinge at the hips keeping the dumbbells close to your legs, back flat throughout. Feel it in the hamstrings, not the lower back."},
+        {"id":"kbswing","icon":"climber","name":"Kettlebell Swing","sets":3,"reps":"15","meta":"3 × 15","weight":15,"gifUrl":"gifs/Kettle_swing.gif","desc":"Hinge, not squat — drive the hips forward explosively to swing the kettlebell to chest height, let it fall back naturally into the next hinge."},
+        {"id":"bandpull","icon":"row","name":"Band Pull-Apart","sets":3,"reps":"15","meta":"3 × 15, band","gifUrl":"gifs/band-pull-apart.gif","desc":"Arms extended in front at shoulder height, pull the band apart by squeezing the shoulder blades together, control the return."},
+        {"id":"glutebridge","icon":"birddog","name":"Single-Leg Glute Bridge","sets":3,"reps":"12/side","meta":"3 × 12/side, bodyweight","gifUrl":"gifs/glute-bridge.gif","desc":"One foot planted, other leg extended, drive through the planted heel to lift the hips, squeeze at the top, lower under control."},
+        {"id":"ohtricep","icon":"pushdown","name":"Overhead Dumbbell Triceps Extension","sets":3,"reps":"12","meta":"3 × 12","weight":10,"gifUrl":"gifs/Dumbbell-Triceps-Extension.gif","desc":"Both hands on one dumbbell overhead, lower behind your head under control, elbows pointed forward and staying still, extend back up."},
+        {"id":"dbcurl","icon":"row","name":"Dumbbell Bicep Curl","sets":3,"reps":"20","meta":"3 × 20","weight":15,"gifUrl":"gifs/bicep-curl.gif","desc":"Elbows pinned to your sides, curl up without swinging the shoulders, squeeze at the top, slow negative. 15 lb is the heaviest dumbbell you own — once 20s feel easy, slow the lowering to 3 seconds instead of adding reps."},
+        {"id":"deadhangcurl","icon":"row","name":"Dead-Hang Dumbbell Bicep Curl","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/deadhang-biceps-curl.gif","desc":"Arms fully extended at the bottom of every rep — no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang."}
+      ]} },
+  { key:'sun', date:'2026-10-04', label:'Sun',
+    run: null,
+    strength: null,
+    restTitle: 'Full rest', restBlurb: "Nothing from Runna scheduled here. Full recovery before Week 5 starts Monday." },
 ];
 
 // ── STORAGE (localStorage — this file is meant to be opened standalone
@@ -414,8 +406,88 @@ function fmtShort(dateStr){
 }
 function emptyLog(){ return { done:false, sets:{}, coreSets:{}, weights:{}, reps:{}, distance:'', effort:null, notes:'' }; }
 
+// ── PLAN PARTS (pure logic — unit-tested separately) ──────
+// A day is made of up to two independently movable parts: a `run` and a
+// `strength` session (strength.kind === 'mobility' for a stretch day).
+// Everything else the app reads off a day (type, title, tag, items,
+// logRun, intensity) is DERIVED from those parts by deriveDay(), so moving
+// a part between days only has to change `run`/`strength` and re-derive.
+const RUN_LOG_FIELDS = ['effort','distance','notes'];
+function deriveDay(day){
+  const run = day.run || null, st = day.strength || null;
+  const stType = (st && st.kind === 'mobility') ? 'mobility' : 'strength';
+  day.items = st ? (st.items || []) : [];
+  if(run && st){ day.type = stType; day.logRun = true; }
+  else if(run){ day.type = 'cardio'; day.logRun = false; }
+  else if(st){ day.type = stType; day.logRun = false; }
+  else { day.type = 'rest'; day.logRun = false; }
+  const titles = [run && run.title, st && st.title].filter(Boolean);
+  day.title = titles.length ? titles.join(' + ') : (day.restTitle || 'Full rest');
+  const tags = [run && run.tag, st && st.tag].filter(Boolean);
+  day.tag = tags.length ? tags.join(' + ') : 'Rest';
+  day.intensity = Math.max(run ? (run.intensity || 0) : 0, st ? (st.intensity || 0) : 0);
+  return day;
+}
+function deriveAll(){ PLAN.forEach(deriveDay); }
+
+function partLabel(part){ return part === 'run' ? 'run' : 'strength session'; }
+
+// What will happen if `part` moves from one day to another. An occupied
+// slot swaps (never two runs or two strength sessions on one day).
+function describeMoveOutcome(fromKey, part, toKey){
+  const to = PLAN.find(d => d.key === toKey);
+  if(to[part]) return { mode:'swap', text:'swaps with ' + to[part].title };
+  const other = part === 'run' ? to.strength : to.run;
+  if(other) return { mode:'join', text:'joins ' + other.title };
+  return { mode:'move', text:'moves here' };
+}
+
+// Logged data travels with the part it belongs to, so nothing is lost or
+// mismatched: exercise sets/reps/weights follow a strength part; effort,
+// distance and notes follow a run. The core-block log stays with the date.
+function transferPartLog(part, from, to, moving, displaced, L){
+  const lf = L[from.date], lt = L[to.date];
+  if(!lf || !lt) return;
+  if(part === 'strength'){
+    const idsOf = p => p ? (p.items || []).map(i => i.id) : [];
+    const movingIds = idsOf(moving), displacedIds = idsOf(displaced);
+    ['sets','reps','weights'].forEach(bucket => {
+      lf[bucket] = lf[bucket] || {}; lt[bucket] = lt[bucket] || {};
+      const out = {}, back = {};
+      movingIds.forEach(id => { if(id in lf[bucket]){ out[id] = lf[bucket][id]; delete lf[bucket][id]; } });
+      displacedIds.forEach(id => { if(id in lt[bucket]){ back[id] = lt[bucket][id]; delete lt[bucket][id]; } });
+      Object.assign(lt[bucket], out);
+      Object.assign(lf[bucket], back);
+    });
+  } else {
+    const blank = { effort:null, distance:'', notes:'' };
+    const a = {}, b = {};
+    RUN_LOG_FIELDS.forEach(k => { a[k] = lf[k]; b[k] = lt[k]; });
+    RUN_LOG_FIELDS.forEach(k => { lt[k] = a[k]; lf[k] = displaced ? b[k] : blank[k]; });
+  }
+  // A day's overall "complete" flag no longer describes what's scheduled
+  // there once a part has moved, so both days start unchecked.
+  [lf, lt].forEach(l => { l.done = false; delete l.completedAt; });
+}
+
+function movePartData(fromKey, part, toKey, L){
+  const from = PLAN.find(d => d.key === fromKey), to = PLAN.find(d => d.key === toKey);
+  if(!from || !to || from === to) return false;
+  if(part !== 'run' && part !== 'strength') return false;
+  if(!from[part]) return false;
+  const moving = from[part];
+  const displaced = to[part] || null;
+  to[part] = moving;
+  from[part] = displaced;
+  transferPartLog(part, from, to, moving, displaced, L);
+  deriveDay(from); deriveDay(to);
+  return true;
+}
+// ── END PLAN PARTS ────────────────────────────────────────
+
 function init(){
   loadPlanOverride();
+  deriveAll();
   PLAN.forEach(day=>{
     const log = loadLog(day.date) || emptyLog();
     if(!log.weights) log.weights = {}; // backward-compat for logs saved before weight tracking existed
@@ -428,15 +500,15 @@ function init(){
   renderHistoryStats();
 }
 
-function planOverrideKey(){ return 'rr-plan-'+WEEK_START; }
+function planOverrideKey(){ return 'rr-plan2-'+WEEK_START; } // v2 = run/strength parts format
 function loadPlanOverride(){
   try{
     const saved = localStorage.getItem(planOverrideKey());
     if(!saved) return;
     const parsed = JSON.parse(saved);
-    if(Array.isArray(parsed) && parsed.length === PLAN.length){
-      PLAN.splice(0, PLAN.length, ...parsed);
-    }
+    const sameShape = Array.isArray(parsed) && parsed.length === PLAN.length &&
+      parsed.every((d, i) => d && d.key === PLAN[i].key && ('run' in d) && ('strength' in d));
+    if(sameShape) PLAN.splice(0, PLAN.length, ...parsed);
   }catch(e){}
 }
 function savePlanOverride(){
@@ -464,9 +536,10 @@ function swapDays(keyA, keyB){
   const idxA = PLAN.findIndex(d=>d.key===keyA);
   const idxB = PLAN.findIndex(d=>d.key===keyB);
   if(idxA<0 || idxB<0) return;
-  const fields = ['tag','title','type','intensity','blurb','items'];
+  const fields = ['run','strength','restTitle','restBlurb'];
   const a = PLAN[idxA], b = PLAN[idxB];
   fields.forEach(f=>{ const tmp = a[f]; a[f] = b[f]; b[f] = tmp; });
+  deriveDay(a); deriveDay(b);
   savePlanOverride();
   // Whatever was logged against the old content on these two days no
   // longer matches what's now scheduled there — start both fresh rather
@@ -481,6 +554,60 @@ function swapDays(keyA, keyB){
 }
 
 // ── WEEK STRIP ────────────────────────────────────────────
+// ── MOVE A PART (run / strength) BETWEEN DAYS ─────────────
+let moveCtx = null; // {fromKey, part}
+function partHeadHtml(day, part, label){
+  return '<div class="part-head"><span class="part-lbl">'+label+'</span>'+
+    '<button class="part-move" onclick="openMoveModal(\''+day.key+'\',\''+part+'\')">Move \u21c4</button></div>';
+}
+function openMoveModal(fromKey, part){
+  const day = PLAN.find(d => d.key === fromKey);
+  if(!day || !day[part]) return;
+  moveCtx = { fromKey, part };
+  document.getElementById('move-title').textContent = 'Move ' + day[part].title + ' to which day?';
+  document.getElementById('move-sub').textContent =
+    'If that day already has a ' + partLabel(part) + ', the two swap places.';
+  document.getElementById('move-options').innerHTML = PLAN.filter(d => d.key !== fromKey).map(d => {
+    const o = describeMoveOutcome(fromKey, part, d.key);
+    return '<button class="swap-opt" onclick="doMovePart(\''+d.key+'\')">'+d.label+
+      ' <span class="so-day">\u2014 '+d.title+'</span>'+
+      '<div class="so-out '+o.mode+'">'+o.text+'</div></button>';
+  }).join('');
+  document.getElementById('move-modal').classList.add('open');
+}
+function closeMoveModal(){
+  document.getElementById('move-modal').classList.remove('open');
+  moveCtx = null;
+}
+function doMovePart(toKey){
+  if(!moveCtx) return;
+  const { fromKey, part } = moveCtx;
+  const fromDay = PLAN.find(d => d.key === fromKey), toDay = PLAN.find(d => d.key === toKey);
+  const title = fromDay[part].title;
+  const displacedTitle = toDay[part] ? toDay[part].title : null;
+  closeMoveModal();
+  if(!movePartData(fromKey, part, toKey, logs)) return;
+  savePlanOverride();
+  saveLog(fromDay.date, logs[fromDay.date]);
+  saveLog(toDay.date, logs[toDay.date]);
+  clearAllTimers();
+  openDay = null;
+  renderStrip(); renderDays(); renderHistoryStats();
+  openDayCard(fromKey); // stay on the day you were working with
+  showToast(displacedTitle
+    ? 'Swapped ' + title + ' with ' + toDay.label + '\u2019s ' + displacedTitle
+    : 'Moved ' + title + ' to ' + toDay.label);
+}
+let toastTimer = null;
+function showToast(msg){
+  let t = document.getElementById('toast');
+  if(!t){ t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
 function renderStrip(){
   const strip = document.getElementById('week-strip');
   strip.innerHTML = '';
@@ -511,7 +638,7 @@ function renderDays(){
     card.innerHTML =
       '<div class="day-head" onclick="toggleDay(\''+day.key+'\')">'+
         '<div class="day-check'+(log.done?' done':'')+'">\u2713</div>'+
-        '<div><div class="day-tag">'+day.label+' \u00b7 '+day.tag+'</div><div class="day-title">'+day.title+'</div></div>'+
+        '<div class="day-head-main"><div class="day-tag">'+day.label+' \u00b7 '+day.tag+'</div><div class="day-title">'+day.title+'</div></div>'+
         '<button class="day-swap" title="Move to another day" onclick="event.stopPropagation();openSwapModal(\''+day.key+'\')">\u21c4</button>'+
         '<div class="day-chev" id="chev-'+day.key+'">\u25be</div>'+
       '</div>'+
@@ -1071,7 +1198,15 @@ function renderDayBody(key){
   const day = PLAN.find(d=>d.key===key);
   const log = logs[day.date];
   const body = document.getElementById('body-'+key);
-  let html = '<div class="blurb">'+day.blurb+'</div>';
+  let html = '';
+  if(day.run){ html += partHeadHtml(day, 'run', 'Run') + '<div class="blurb">'+day.run.blurb+'</div>'; }
+  if(day.strength){
+    html += partHeadHtml(day, 'strength', day.strength.kind === 'mobility' ? 'Mobility' : 'Strength') +
+      '<div class="blurb">'+day.strength.blurb+'</div>';
+  }
+  if(!day.run && !day.strength){
+    html += '<div class="blurb">'+(day.restBlurb || 'Nothing scheduled here \u2014 full recovery.')+'</div>';
+  }
   html += restSettingsHtml();
 
   if(day.type === 'mobility'){
