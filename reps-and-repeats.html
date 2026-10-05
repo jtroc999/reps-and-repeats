@@ -191,7 +191,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v09.27.26.2</div>
+    <div class="version-tag">v10.05.26.2</div>
   </main>
 </div>
 
@@ -279,57 +279,48 @@ const CORE = [
 // A day is made of up to two movable parts: `run` and `strength`. Title,
 // tag, type, items and the run-log fields are all DERIVED from them by
 // deriveDay() — never set those by hand.
-const WEEK_START = '2026-09-28';
+const WEEK_START = '2026-10-05';
 const PLAN = [
-  { key:'mon', date:'2026-09-28', label:'Mon',
-    run: {"tag":"Runna","title":"Easy Run — 5mi","intensity":2,"blurb":"5k Improvement Plan (Week 4/6). 5mi easy run at a conversational pace — no faster than 9:00/mi (Runna tightened the limit slightly from 9:05). This is a limit, not a target: run at whatever pace feels truly easy. Garmin flagged STRAINED the last two days after your biggest running week yet, so let today’s effort be genuinely easy."},
+  { key:'mon', date:'2026-10-05', label:'Mon',
+    run: {"tag":"Runna","title":"Tempo — Rolling 800s","intensity":3,"blurb":"5k Improvement Plan (Week 5/6) — 3.5mi total. 0.75mi warm-up at a conversational pace (no faster than 9:00/mi). Then repeat 2×: 0.5mi @ 7:10/mi, straight into 0.5mi @ 8:30/mi (the 8:30 half is your recovery — keep it controlled). 90s walking rest, then a 0.75mi cool-down at a conversational pace or slower. Your readiness rebounded to 70 and HRV to 50 on Sunday after a rough Thursday–Saturday, so this is a go — but check this morning’s reading first: if Garmin calls it Low (under 50), run the 7:10s by feel instead of chasing the pace."},
     strength: null },
-  { key:'tue', date:'2026-09-29', label:'Tue',
+  { key:'tue', date:'2026-10-06', label:'Tue',
     run: null,
-    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Both gym sessions last week landed exactly on target across all 8 lifts, so last Thursday’s dip was a one-off. Leg Curl, Leg Extension, and Seated Row have each cleared 12/12/12 cleanly on two sessions at their new weights — stepping each up one rep per set (13/13/13). Reps climb first; hitting 15 on every set is what triggers the next weight bump. Everything else holds. If your legs feel heavy after Monday’s run, stay at 12s today.","items":[
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Both gym sessions last week landed on target across all 8 lifts. Leg Extension and Seated Row hit 13/13/13 on two sessions running, so each steps up one rep per set (14/14/14, same weights). Leg Curl held 13 on sets 1–2 but fell to 10 on set 3 both times, so it stays at 13/13/13 until that third set lands. Everything else holds on target. This follows Monday’s tempo — if your legs are heavy, stay at 13s on Leg Extension.","items":[
         {"id":"legpress","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
         {"id":"benchpress","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
         {"id":"latpulldown","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
         {"id":"legcurl","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
         {"id":"shoulderpress","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
-        {"id":"legext","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"legext","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"14/14/14","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
         {"id":"kneeraise","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
-        {"id":"seatedrow","icon":"row","name":"Cable Seated Row","sets":3,"reps":"13/13/13","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
+        {"id":"seatedrow","icon":"row","name":"Cable Seated Row","sets":3,"reps":"14/14/14","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
       ]} },
-  { key:'wed', date:'2026-09-30', label:'Wed',
-    run: {"tag":"Runna","title":"Intervals — Pyramid","intensity":3,"blurb":"5k Improvement Plan (Week 4/6) — 4.9mi total. 1.5mi warm-up at a conversational pace (no faster than 9:00/mi), 90s walking rest. Then the pyramid: 0.12mi @ 6:20/mi (60s walk), 0.25mi @ 6:30/mi (90s walk), 0.5mi @ 7:00/mi (90s walk), 0.75mi @ 7:15/mi (120s walk), then back down: 0.5mi @ 7:00/mi (90s walk), 0.25mi @ 6:30/mi (90s walk), 0.12mi @ 6:20/mi (60s walk). Finish with a 0.9mi cool-down at a conversational pace or slower."},
+  { key:'wed', date:'2026-10-07', label:'Wed',
+    run: {"tag":"Runna","title":"Easy Run — 3.25mi","intensity":2,"blurb":"5k Improvement Plan (Week 5/6). 3.25mi easy run at a conversational pace — no faster than 9:00/mi. This is a limit, not a target: run at whatever pace feels truly easy."},
     strength: null },
-  { key:'thu', date:'2026-10-01', label:'Thu',
+  { key:'thu', date:'2026-10-08', label:'Thu',
     run: null,
-    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Same session as Tuesday, including the one-rep bumps on Leg Curl, Leg Extension, and Seated Row. It follows Wednesday’s pyramid intervals, so if your legs are cooked, it’s fine to stay at 12s or trim a set — no pressure to force it.","items":[
-        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Same session as Tuesday, but this is your last gym day before the trip, so the three leg lifts drop to 2 sets (same weights and targets) to keep your legs fresh for Saturday’s wading. Upper body and core are unchanged. Tuesday keeps the full 3 sets and the new 14s.","items":[
+        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":2,"reps":"20/20","meta":"2 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
         {"id":"benchpress2","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
         {"id":"latpulldown2","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
-        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
+        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":2,"reps":"13/13","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
         {"id":"shoulderpress2","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
-        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":2,"reps":"14/14","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
         {"id":"kneeraise2","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
-        {"id":"seatedrow2","icon":"row","name":"Cable Seated Row","sets":3,"reps":"13/13/13","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
+        {"id":"seatedrow2","icon":"row","name":"Cable Seated Row","sets":3,"reps":"14/14/14","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
       ]} },
-  { key:'fri', date:'2026-10-02', label:'Fri',
-    run: {"tag":"Runna","title":"Easy Run — 3.75mi","intensity":2,"blurb":"5k Improvement Plan (Week 4/6). 3.75mi easy run at a conversational pace — no faster than 9:00/mi. This is a limit, not a target: run at whatever pace feels truly easy."},
+  { key:'fri', date:'2026-10-09', label:'Fri',
+    run: {"label":"Trip","tag":"Trip","title":"Zion — drive + car camp","intensity":1,"blurb":"Zion trip, day 1: drive down and car camp at Watchman Campground (site A007). Nothing to train — keep your legs fresh and hydrate. The log below is optional."},
     strength: null },
-  { key:'sat', date:'2026-10-03', label:'Sat',
-    run: {"tag":"Runna","title":"Long Run 9.5mi","intensity":3,"blurb":"5k Improvement Plan (Week 4/6) — 9.5mi at a conversational pace, the longest run of the plan. Log effort, distance, and notes at the bottom of this card."},
-    strength: {"kind":"strength","tag":"Home","title":"Home strength","intensity":2,"blurb":"Home circuit — do it whenever works, or use Move to shift it to another day. One change from your logged data: Dumbbell Bicep Curl went 20/20/20 at 15 lb last Saturday against a target of 12, so the target now matches what you’re actually doing (3 × 20). Everything else in the circuit held its target exactly — no changes.","items":[
-        {"id":"kbsquat","icon":"press","name":"Kettlebell Goblet Squat","sets":3,"reps":"12","meta":"3 × 12","weight":15,"gifUrl":"gifs/Kettlebell-goblet-squat.gif","desc":"Hold the kettlebell close to your chest, squat down keeping your chest up and knees tracking over your toes, drive back up through your heels."},
-        {"id":"dbrdl","icon":"seatreach","name":"Dumbbell Romanian Deadlift","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/dumbell-romanian-deadlift.gif","desc":"Soft knees, hinge at the hips keeping the dumbbells close to your legs, back flat throughout. Feel it in the hamstrings, not the lower back."},
-        {"id":"kbswing","icon":"climber","name":"Kettlebell Swing","sets":3,"reps":"15","meta":"3 × 15","weight":15,"gifUrl":"gifs/Kettle_swing.gif","desc":"Hinge, not squat — drive the hips forward explosively to swing the kettlebell to chest height, let it fall back naturally into the next hinge."},
-        {"id":"bandpull","icon":"row","name":"Band Pull-Apart","sets":3,"reps":"15","meta":"3 × 15, band","gifUrl":"gifs/band-pull-apart.gif","desc":"Arms extended in front at shoulder height, pull the band apart by squeezing the shoulder blades together, control the return."},
-        {"id":"glutebridge","icon":"birddog","name":"Single-Leg Glute Bridge","sets":3,"reps":"12/side","meta":"3 × 12/side, bodyweight","gifUrl":"gifs/glute-bridge.gif","desc":"One foot planted, other leg extended, drive through the planted heel to lift the hips, squeeze at the top, lower under control."},
-        {"id":"ohtricep","icon":"pushdown","name":"Overhead Dumbbell Triceps Extension","sets":3,"reps":"12","meta":"3 × 12","weight":10,"gifUrl":"gifs/Dumbbell-Triceps-Extension.gif","desc":"Both hands on one dumbbell overhead, lower behind your head under control, elbows pointed forward and staying still, extend back up."},
-        {"id":"dbcurl","icon":"row","name":"Dumbbell Bicep Curl","sets":3,"reps":"20","meta":"3 × 20","weight":15,"gifUrl":"gifs/bicep-curl.gif","desc":"Elbows pinned to your sides, curl up without swinging the shoulders, squeeze at the top, slow negative. 15 lb is the heaviest dumbbell you own — once 20s feel easy, slow the lowering to 3 seconds instead of adding reps."},
-        {"id":"deadhangcurl","icon":"row","name":"Dead-Hang Dumbbell Bicep Curl","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/deadhang-biceps-curl.gif","desc":"Arms fully extended at the bottom of every rep — no partial reps. Curl up under control, pause briefly, lower all the way back to a dead hang."}
-      ]} },
-  { key:'sun', date:'2026-10-04', label:'Sun',
-    run: null,
+  { key:'sat', date:'2026-10-10', label:'Sat',
+    run: {"label":"Trip","tag":"Trip","title":"Zion Narrows — Day 1","intensity":3,"blurb":"Narrows Overnight, top-down: Chamberlain’s Ranch toward Temple of Sinawava — about 16 miles over the two days, with your night at campsite 7 (Box Elder). This stands in for the week’s long run. Log effort and distance if you like."},
+    strength: null },
+  { key:'sun', date:'2026-10-11', label:'Sun',
+    run: {"label":"Trip","tag":"Trip","title":"Zion Narrows — Day 2 + drive home","intensity":2,"blurb":"Finish at Temple of Sinawava and drive home. Race week starts Monday — once Runna posts it, the next sync will pull it in and I’ll build the week around how your legs feel after two days of wading."},
     strength: null,
-    restTitle: 'Full rest', restBlurb: "Nothing from Runna scheduled here. Full recovery before Week 5 starts Monday." },
+    restTitle: "Full rest", restBlurb: "Nothing scheduled — full recovery. Race week starts Monday; the gym pulls back then." },
 ];
 
 // ── STORAGE (localStorage — this file is meant to be opened standalone
@@ -566,7 +557,7 @@ function openMoveModal(fromKey, part){
   moveCtx = { fromKey, part };
   document.getElementById('move-title').textContent = 'Move ' + day[part].title + ' to which day?';
   document.getElementById('move-sub').textContent =
-    'If that day already has a ' + partLabel(part) + ', the two swap places.';
+    'If that day already has a ' + (day[part].label ? day[part].label.toLowerCase() : partLabel(part)) + ', the two swap places.';
   document.getElementById('move-options').innerHTML = PLAN.filter(d => d.key !== fromKey).map(d => {
     const o = describeMoveOutcome(fromKey, part, d.key);
     return '<button class="swap-opt" onclick="doMovePart(\''+d.key+'\')">'+d.label+
@@ -1199,7 +1190,7 @@ function renderDayBody(key){
   const log = logs[day.date];
   const body = document.getElementById('body-'+key);
   let html = '';
-  if(day.run){ html += partHeadHtml(day, 'run', 'Run') + '<div class="blurb">'+day.run.blurb+'</div>'; }
+  if(day.run){ html += partHeadHtml(day, 'run', day.run.label || 'Run') + '<div class="blurb">'+day.run.blurb+'</div>'; }
   if(day.strength){
     html += partHeadHtml(day, 'strength', day.strength.kind === 'mobility' ? 'Mobility' : 'Strength') +
       '<div class="blurb">'+day.strength.blurb+'</div>';
