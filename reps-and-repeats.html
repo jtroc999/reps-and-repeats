@@ -148,6 +148,12 @@ textarea{resize:vertical; min-height:52px;}
 .weight-editor input{flex:1; background:none; border:none; color:var(--ochre); font-family:'Big Shoulders Display',sans-serif; font-size:20px; text-align:right; width:100%;}
 .weight-editor .wu{color:var(--text3); font-size:13px; flex-shrink:0;}
 .reps-editor{background:var(--bg3); border:1px solid var(--border2); border-radius:9px; padding:10px 12px; margin-bottom:14px;}
+.reps-editor-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+.reps-editor-head .reps-editor-title{margin-bottom:0;}
+.set-adjust{display:flex; align-items:center; gap:8px;}
+.set-adj-btn{width:34px; height:34px; border-radius:50%; border:1px solid var(--border2); background:var(--bg); color:var(--ochre); font-size:20px; line-height:1; cursor:pointer;}
+.set-adj-btn:disabled{opacity:0.3; cursor:default;}
+.set-adj-n{min-width:16px; text-align:center; font-family:'Big Shoulders Display',sans-serif; font-size:18px; color:var(--text);}
 .reps-editor-title{font-size:11px; color:var(--text3); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:8px;}
 .reps-set-row{display:flex; align-items:center; gap:10px; padding:6px 0; border-top:1px solid var(--border);}
 .reps-set-row:first-of-type{border-top:none;}
@@ -191,7 +197,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v10.05.26.2</div>
+    <div class="version-tag">v10.08.26.1</div>
   </main>
 </div>
 
@@ -301,24 +307,33 @@ const PLAN = [
     strength: null },
   { key:'thu', date:'2026-10-08', label:'Thu',
     run: null,
-    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Same session as Tuesday, but this is your last gym day before the trip, so the three leg lifts drop to 2 sets (same weights and targets) to keep your legs fresh for Saturday’s wading. Upper body and core are unchanged. Tuesday keeps the full 3 sets and the new 14s.","items":[
-        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":2,"reps":"20/20","meta":"2 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Same session as Tuesday. Zion was cancelled, so the three leg lifts are back to the full 3 sets — use the − / + buttons in an exercise to adjust sets on the fly.","items":[
+        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
         {"id":"benchpress2","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
         {"id":"latpulldown2","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
-        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":2,"reps":"13/13","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
+        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
         {"id":"shoulderpress2","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
-        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":2,"reps":"14/14","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"14/14/14","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
         {"id":"kneeraise2","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
         {"id":"seatedrow2","icon":"row","name":"Cable Seated Row","sets":3,"reps":"14/14/14","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
       ]} },
   { key:'fri', date:'2026-10-09', label:'Fri',
-    run: {"label":"Trip","tag":"Trip","title":"Zion — drive + car camp","intensity":1,"blurb":"Zion trip, day 1: drive down and car camp at Watchman Campground (site A007). Nothing to train — keep your legs fresh and hydrate. The log below is optional."},
+    run: {"tag":"Runna","title":"Run — awaiting Runna","intensity":2,"blurb":"Zion was cancelled, so Friday is a normal run day. Runna hasn’t posted this one yet — do whatever it shows on your watch and log it here."},
     strength: null },
   { key:'sat', date:'2026-10-10', label:'Sat',
-    run: {"label":"Trip","tag":"Trip","title":"Zion Narrows — Day 1","intensity":3,"blurb":"Narrows Overnight, top-down: Chamberlain’s Ranch toward Temple of Sinawava — about 16 miles over the two days, with your night at campsite 7 (Box Elder). This stands in for the week’s long run. Log effort and distance if you like."},
-    strength: null },
+    run: {"tag":"Runna","title":"Long Run — awaiting Runna","intensity":3,"blurb":"Zion was cancelled, so Saturday is a normal long-run day. Runna hasn’t posted it yet — follow what it shows on your watch and log it here."},
+    strength: {"kind":"strength","tag":"Home","title":"Home strength circuit","intensity":2,"blurb":"Your usual home circuit, back on the schedule now that Zion is off. Last Saturday every set landed; same weights and reps again. Tap ⇄ to slide it to Sunday if you’d rather not stack it on the long run.","items":[
+        {"id":"kbsquat","icon":"standquad","name":"Kettlebell Goblet Squat","sets":3,"reps":"12","meta":"3 × 12","weight":15,"gifUrl":"gifs/Kettlebell-goblet-squat.gif","desc":"Hold the kettlebell at your chest, elbows tucked. Sit down between your knees with a tall chest, drive up through the whole foot."},
+        {"id":"dbrdl","icon":"standquad","name":"Dumbbell Romanian Deadlift","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/dumbell-romanian-deadlift.gif","desc":"Soft knees, hips push back, dumbbells slide down the thighs with a flat back. Stand tall by squeezing the glutes. Once all three sets hit 15, move to the 15 lb dumbbells."},
+        {"id":"kbswing","icon":"standquad","name":"Kettlebell Swing","sets":3,"reps":"15","meta":"3 × 15","weight":15,"gifUrl":"gifs/Kettle_swing.gif","desc":"Hinge, don’t squat — snap the hips forward and let the bell float to chest height. Arms are just hooks."},
+        {"id":"bandpull","icon":"row","name":"Band Pull-Apart","sets":3,"reps":"15","meta":"3 × 15, band","gifUrl":"gifs/band-pull-apart.gif","desc":"Arms straight at chest height, pull the band apart by squeezing the shoulder blades together. Control it back."},
+        {"id":"glutebridge","icon":"birddog","name":"Single-Leg Glute Bridge","sets":3,"reps":"12","meta":"3 × 12/side, bodyweight","gifUrl":"gifs/glute-bridge.gif","desc":"One foot planted, other leg extended. Drive through the heel, hips level, squeeze at the top. Complete all reps each side."},
+        {"id":"ohtricep","icon":"press","name":"Overhead Dumbbell Triceps Extension","sets":3,"reps":"12","meta":"3 × 12","weight":10,"gifUrl":"gifs/Dumbbell-Triceps-Extension.gif","desc":"One dumbbell held overhead with both hands, elbows pointing forward. Lower behind the head, extend fully."},
+        {"id":"dbcurl","icon":"row","name":"Dumbbell Bicep Curl","sets":3,"reps":"20","meta":"3 × 20","weight":15,"gifUrl":"gifs/bicep-curl.gif","desc":"Elbows pinned to your sides, curl up, squeeze, lower slowly. 15 lb is your heaviest pair — once 20s feel easy, slow the lowering to 3 seconds."},
+        {"id":"deadhangcurl","icon":"row","name":"Dead-Hang Dumbbell Bicep Curl","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/deadhang-biceps-curl.gif","desc":"Let the arm hang fully straight at the bottom of every rep — pause there for a beat, then curl. No swinging."}
+      ]} },
   { key:'sun', date:'2026-10-11', label:'Sun',
-    run: {"label":"Trip","tag":"Trip","title":"Zion Narrows — Day 2 + drive home","intensity":2,"blurb":"Finish at Temple of Sinawava and drive home. Race week starts Monday — once Runna posts it, the next sync will pull it in and I’ll build the week around how your legs feel after two days of wading."},
+    run: null,
     strength: null,
     restTitle: "Full rest", restBlurb: "Nothing scheduled — full recovery. Race week starts Monday; the gym pulls back then." },
 ];
@@ -395,7 +410,7 @@ function todayKey(){
 function fmtShort(dateStr){
   return new Date(dateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
-function emptyLog(){ return { done:false, sets:{}, coreSets:{}, weights:{}, reps:{}, distance:'', effort:null, notes:'' }; }
+function emptyLog(){ return { done:false, sets:{}, coreSets:{}, weights:{}, reps:{}, setCounts:{}, distance:'', effort:null, notes:'' }; }
 
 // ── PLAN PARTS (pure logic — unit-tested separately) ──────
 // A day is made of up to two independently movable parts: a `run` and a
@@ -421,6 +436,30 @@ function deriveDay(day){
 }
 function deriveAll(){ PLAN.forEach(deriveDay); }
 
+// Add/remove sets on the fly: the plan's set count is only the default.
+// A per-date override lives in log.setCounts[itemId]; everything that
+// draws or counts sets goes through effectiveSets().
+const MIN_SETS = 1, MAX_SETS = 8;
+function effectiveSets(log, item){
+  const o = log && log.setCounts ? log.setCounts[item.id] : undefined;
+  return (typeof o === 'number' && o >= MIN_SETS && o <= MAX_SETS) ? o : item.sets;
+}
+// Returns the new count (unchanged if the move is out of range). Trims
+// per-set completion + reps when shrinking; an override equal to the
+// plan's own count is dropped so the day reads as unadjusted.
+function adjustSetCount(log, item, delta){
+  const cur = effectiveSets(log, item);
+  const n = cur + delta;
+  if(n < MIN_SETS || n > MAX_SETS) return cur;
+  if(!log.setCounts) log.setCounts = {};
+  if(n === item.sets) delete log.setCounts[item.id]; else log.setCounts[item.id] = n;
+  if(n < cur){
+    if(Array.isArray(log.sets && log.sets[item.id])) log.sets[item.id].length = Math.min(log.sets[item.id].length, n);
+    if(Array.isArray(log.reps && log.reps[item.id])) log.reps[item.id].length = Math.min(log.reps[item.id].length, n);
+  }
+  return n;
+}
+
 function partLabel(part){ return part === 'run' ? 'run' : 'strength session'; }
 
 // What will happen if `part` moves from one day to another. An occupied
@@ -442,7 +481,7 @@ function transferPartLog(part, from, to, moving, displaced, L){
   if(part === 'strength'){
     const idsOf = p => p ? (p.items || []).map(i => i.id) : [];
     const movingIds = idsOf(moving), displacedIds = idsOf(displaced);
-    ['sets','reps','weights'].forEach(bucket => {
+    ['sets','reps','weights','setCounts'].forEach(bucket => {
       lf[bucket] = lf[bucket] || {}; lt[bucket] = lt[bucket] || {};
       const out = {}, back = {};
       movingIds.forEach(id => { if(id in lf[bucket]){ out[id] = lf[bucket][id]; delete lf[bucket][id]; } });
@@ -482,6 +521,7 @@ function init(){
   PLAN.forEach(day=>{
     const log = loadLog(day.date) || emptyLog();
     if(!log.weights) log.weights = {}; // backward-compat for logs saved before weight tracking existed
+    if(!log.setCounts) log.setCounts = {};
     if(!log.reps) log.reps = {}; // backward-compat for logs saved before per-set rep tracking existed
     logs[day.date] = log;
   });
@@ -794,10 +834,11 @@ function exRowHtml(dateKey, item, kind){
 function setPipsHtml(dateKey, item, kind){
   const log = logs[dateKey];
   const bucket = kind==='core' ? log.coreSets : log.sets;
-  const arr = ensureSetArray(bucket, item.id, item.sets);
+  const n = effectiveSets(log, item);
+  const arr = ensureSetArray(bucket, item.id, n);
   let pips = '';
-  for(let i=0; i<item.sets; i++){
-    pips += '<div class="pip'+(arr[i]?' done':'')+'" onclick="event.stopPropagation();toggleSet(\''+dateKey+'\',\''+item.id+'\','+i+','+item.sets+',\''+kind+'\')">'+(arr[i]?'\u2713':(i+1))+'</div>';
+  for(let i=0; i<n; i++){
+    pips += '<div class="pip'+(arr[i]?' done':'')+'" onclick="event.stopPropagation();toggleSet(\''+dateKey+'\',\''+item.id+'\','+i+','+n+',\''+kind+'\')">'+(arr[i]?'\u2713':(i+1))+'</div>';
   }
   return pips;
 }
@@ -845,8 +886,11 @@ function currentWeight(dateKey, item){
   return (w !== undefined && w !== null && w !== '') ? w : item.weight;
 }
 function displayMeta(dateKey, item){
-  if(item.weight === undefined || item.weight === null) return item.meta;
-  return item.meta + ' @ ' + currentWeight(dateKey, item) + ' lb';
+  let m = item.meta;
+  const n = item.sets ? effectiveSets(logs[dateKey], item) : null;
+  if(n !== null && n !== item.sets) m = n + (n===1?' set':' sets') + ' (adjusted)';
+  if(item.weight === undefined || item.weight === null) return m;
+  return m + ' @ ' + currentWeight(dateKey, item) + ' lb';
 }
 
 function isModalShowing(dateKey, itemId, kind){
@@ -1121,15 +1165,21 @@ function renderModalRest(rowId){
   }
 }
 
-function targetRepsArray(item){
+function targetRepsArray(item, n){
   // Parses item.reps (e.g. "20/20/25", "12", "12/side") into one target
   // number per set. Falls back to repeating a single value, or blank
   // placeholders if nothing numeric parses cleanly.
   if(!item.sets) return [];
-  const nums = (item.reps || '').split('/').map(s => parseInt(s, 10)).filter(n => !isNaN(n));
-  if(nums.length === item.sets) return nums;
-  if(nums.length === 1) return Array(item.sets).fill(nums[0]);
-  return Array(item.sets).fill('');
+  const total = n || item.sets;
+  const nums = (item.reps || '').split('/').map(s => parseInt(s, 10)).filter(x => !isNaN(x));
+  let base;
+  if(nums.length === item.sets) base = nums;
+  else if(nums.length === 1) base = Array(item.sets).fill(nums[0]);
+  else base = Array(item.sets).fill('');
+  // Added sets repeat the last planned target; removed sets drop off the end.
+  const out = base.slice(0, total);
+  while(out.length < total) out.push(base[base.length-1]);
+  return out;
 }
 
 function renderSetsEditor(dateKey, itemId, item, kind){
@@ -1138,22 +1188,41 @@ function renderSetsEditor(dateKey, itemId, item, kind){
   const log = logs[dateKey];
   if(!log.reps) log.reps = {};
   const bucket = kind==='core' ? log.coreSets : log.sets;
-  const arr = ensureSetArray(bucket, itemId, item.sets);
-  const targets = targetRepsArray(item);
+  const n = effectiveSets(log, item);
+  const arr = ensureSetArray(bucket, itemId, n);
+  const targets = targetRepsArray(item, n);
   const logged = log.reps[itemId] || [];
   let rows = '';
-  for(let i=0; i<item.sets; i++){
+  for(let i=0; i<n; i++){
     const val = (logged[i] !== undefined && logged[i] !== null && logged[i] !== '') ? logged[i] : targets[i];
     rows += '<div class="reps-set-row">'+
-      '<div class="set-check'+(arr[i]?' done':'')+'" data-item="'+itemId+'" data-set="'+i+'" onclick="toggleSet(\''+dateKey+'\',\''+itemId+'\','+i+','+item.sets+',\''+kind+'\')">'+(arr[i]?'\u2713':'')+'</div>'+
+      '<div class="set-check'+(arr[i]?' done':'')+'" data-item="'+itemId+'" data-set="'+i+'" onclick="toggleSet(\''+dateKey+'\',\''+itemId+'\','+i+','+n+',\''+kind+'\')">'+(arr[i]?'\u2713':'')+'</div>'+
       '<label>Set '+(i+1)+' <span class="target">(target '+(targets[i]!==undefined && targets[i]!=='' ? targets[i] : '\u2014')+')</span></label>'+
       '<input type="number" inputmode="numeric" data-set="'+i+'" value="'+(val!==undefined?val:'')+'">'+
       '</div>';
   }
-  area.innerHTML = '<div class="reps-editor"><div class="reps-editor-title">Sets</div>'+rows+'</div>';
+  const ctl = '<div class="set-adjust">'+
+    '<button class="set-adj-btn" aria-label="Remove last set" '+(n<=MIN_SETS?'disabled ':'')+'onclick="changeSetCount(\''+dateKey+'\',\''+itemId+'\',\''+kind+'\',-1)">\u2212</button>'+
+    '<span class="set-adj-n">'+n+'</span>'+
+    '<button class="set-adj-btn" aria-label="Add a set" '+(n>=MAX_SETS?'disabled ':'')+'onclick="changeSetCount(\''+dateKey+'\',\''+itemId+'\',\''+kind+'\',1)">+</button></div>';
+  area.innerHTML = '<div class="reps-editor"><div class="reps-editor-head"><div class="reps-editor-title">Sets'+(n!==item.sets?' \u00b7 adjusted from '+item.sets:'')+'</div>'+ctl+'</div>'+rows+'</div>';
   area.querySelectorAll('input').forEach(inp=>{
     inp.onchange = function(){ saveReps(dateKey, itemId, parseInt(inp.dataset.set, 10), inp.value); };
   });
+}
+
+function changeSetCount(dateKey, itemId, kind, delta){
+  const log = logs[dateKey];
+  const item = findItem(dateKey, itemId, kind);
+  if(!item || !item.sets) return;
+  adjustSetCount(log, item, delta);
+  saveLog(dateKey, log);
+  renderSetsEditor(dateKey, itemId, item, kind);
+  const rowId = dateKey+'-'+itemId;
+  const ctrl = document.getElementById('ctrl-'+rowId);
+  if(ctrl) ctrl.innerHTML = setPipsHtml(dateKey, item, kind);
+  const metaEl = document.getElementById('meta-'+rowId);
+  if(metaEl) metaEl.textContent = displayMeta(dateKey, item);
 }
 
 function saveReps(dateKey, itemId, setIndex, value){
