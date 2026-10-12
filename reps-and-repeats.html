@@ -197,7 +197,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v10.08.26.1</div>
+    <div class="version-tag">v10.12.26.1</div>
   </main>
 </div>
 
@@ -285,57 +285,53 @@ const CORE = [
 // A day is made of up to two movable parts: `run` and `strength`. Title,
 // tag, type, items and the run-log fields are all DERIVED from them by
 // deriveDay() — never set those by hand.
-const WEEK_START = '2026-10-05';
+const WEEK_START = '2026-10-12';
 const PLAN = [
-  { key:'mon', date:'2026-10-05', label:'Mon',
-    run: {"tag":"Runna","title":"Tempo — Rolling 800s","intensity":3,"blurb":"5k Improvement Plan (Week 5/6) — 3.5mi total. 0.75mi warm-up at a conversational pace (no faster than 9:00/mi). Then repeat 2×: 0.5mi @ 7:10/mi, straight into 0.5mi @ 8:30/mi (the 8:30 half is your recovery — keep it controlled). 90s walking rest, then a 0.75mi cool-down at a conversational pace or slower. Your readiness rebounded to 70 and HRV to 50 on Sunday after a rough Thursday–Saturday, so this is a go — but check this morning’s reading first: if Garmin calls it Low (under 50), run the 7:10s by feel instead of chasing the pace."},
+  { key:'mon', date:'2026-10-12', label:'Mon',
+    run: {"tag":"Runna","title":"Taper Intervals — Taper 400s","intensity":2,"blurb":"5k Improvement Plan (Week 6/6) — 3.8mi total. 1.5mi warm-up at a conversational pace (no faster than 9:00/mi), keeping it easy, then a 60s walk. Then 5 reps of 0.25mi at 6:55/mi — just faster than your 7:05/mi target race pace — with 90s walking rest between. Finish with a 1mi cool-down at a conversational pace (or slower). Short and sharp: you should finish feeling like you had more."},
     strength: null },
-  { key:'tue', date:'2026-10-06', label:'Tue',
+  { key:'tue', date:'2026-10-13', label:'Tue',
     run: null,
-    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Both gym sessions last week landed on target across all 8 lifts. Leg Extension and Seated Row hit 13/13/13 on two sessions running, so each steps up one rep per set (14/14/14, same weights). Leg Curl held 13 on sets 1–2 but fell to 10 on set 3 both times, so it stays at 13/13/13 until that third set lands. Everything else holds on target. This follows Monday’s tempo — if your legs are heavy, stay at 13s on Leg Extension.","items":[
-        {"id":"legpress","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Race is Sunday, so this is the last real gym day. Upper body stays at 3 sets, same weights. The three leg lifts drop to 2 sets (same weights and targets) to keep your legs fresh. Seated Row steps up to 15/15/15 after you hit 15 on every set Thursday. Add an easy walk or short jog today if you want steps — keep it conversational.","items":[
+        {"id":"legpress","icon":"press","name":"Machine Leg Press","sets":2,"reps":"20/20","meta":"2 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
         {"id":"benchpress","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
         {"id":"latpulldown","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
-        {"id":"legcurl","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
+        {"id":"legcurl","icon":"row","name":"Machine Leg Curl (prone)","sets":2,"reps":"13/13","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
         {"id":"shoulderpress","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
-        {"id":"legext","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"14/14/14","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"legext","icon":"row","name":"Machine Leg Extension","sets":2,"reps":"14/14","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
         {"id":"kneeraise","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
-        {"id":"seatedrow","icon":"row","name":"Cable Seated Row","sets":3,"reps":"14/14/14","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
+        {"id":"seatedrow","icon":"row","name":"Cable Seated Row","sets":3,"reps":"15/15/15","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
       ]} },
-  { key:'wed', date:'2026-10-07', label:'Wed',
-    run: {"tag":"Runna","title":"Easy Run — 3.25mi","intensity":2,"blurb":"5k Improvement Plan (Week 5/6). 3.25mi easy run at a conversational pace — no faster than 9:00/mi. This is a limit, not a target: run at whatever pace feels truly easy."},
+  { key:'wed', date:'2026-10-14', label:'Wed',
+    run: {"tag":"Runna","title":"Easy Run — 3.75mi","intensity":1,"blurb":"5k Improvement Plan (Week 6/6). 3.75mi easy run at a conversational pace — no faster than 9:00/mi. A limit, not a target: run whatever feels truly easy. This is race week; the goal is freshness."},
     strength: null },
-  { key:'thu', date:'2026-10-08', label:'Thu',
+  { key:'thu', date:'2026-10-15', label:'Thu',
     run: null,
-    strength: {"kind":"strength","tag":"Gym","title":"Standing routine","intensity":2,"blurb":"Same session as Tuesday. Zion was cancelled, so the three leg lifts are back to the full 3 sets — use the − / + buttons in an exercise to adjust sets on the fly.","items":[
-        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":3,"reps":"20/20/25","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
-        {"id":"benchpress2","icon":"press","name":"Machine Bench/Chest Press","sets":3,"reps":"10/8/8","meta":"3 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
-        {"id":"latpulldown2","icon":"pulldown","name":"Machine Lat Pulldown","sets":3,"reps":"15/15/10","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
-        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":3,"reps":"13/13/13","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
-        {"id":"shoulderpress2","icon":"press","name":"Machine Shoulder Press","sets":3,"reps":"15/12/12","meta":"3 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
-        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":3,"reps":"14/14/14","meta":"3 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
-        {"id":"kneeraise2","icon":"birddog","name":"Hanging Knee Raise","sets":3,"reps":"15/15/15","meta":"3 × 15, bodyweight","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
-        {"id":"seatedrow2","icon":"row","name":"Cable Seated Row","sets":3,"reps":"14/14/14","meta":"3 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
+    strength: {"kind":"strength","tag":"Gym","title":"Standing routine — light primer","intensity":1,"blurb":"Three days to the race — this is a primer, not a workout. Every lift is 2 sets at the same weight; stop each set with 2–3 reps still in the tank. No new stimulus, nothing to chase. Easy walking or a short comfortable jog for steps is fine.","items":[
+        {"id":"legpress2","icon":"press","name":"Machine Leg Press","sets":2,"reps":"20/20","meta":"2 sets","weight":120,"gifUrl":"gifs/machine-leg-press.gif","desc":"Feet shoulder-width on the plate, release the safety, lower to about 90° at the knee, drive through the heels back up."},
+        {"id":"benchpress2","icon":"press","name":"Machine Bench/Chest Press","sets":2,"reps":"10/8","meta":"2 sets","weight":120,"gifUrl":"gifs/machine-bench-chest-press.gif","desc":"Seat and press-arm angle set so handles line up with mid/upper chest. Press to full extension without locking elbows hard, lower back to chest level."},
+        {"id":"latpulldown2","icon":"pulldown","name":"Machine Lat Pulldown","sets":2,"reps":"15/15","meta":"2 sets","weight":75,"gifUrl":"gifs/machine-lat-pulldown.gif","desc":"Thigh pad locked down, overhand grip slightly wider than shoulder-width, chest lifted, pull to upper chest, controlled return."},
+        {"id":"legcurl2","icon":"row","name":"Machine Leg Curl (prone)","sets":2,"reps":"13/13","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-curl-prone.gif","desc":"Pad rests against the back of the ankles/lower calves. Curl toward the glutes, squeeze at full flexion, slow release."},
+        {"id":"shoulderpress2","icon":"press","name":"Machine Shoulder Press","sets":2,"reps":"15/12","meta":"2 sets","weight":75,"gifUrl":"gifs/machine-shoulder-press.gif","desc":"Seat low enough that handles start at shoulder height, press to full extension overhead, lower under control back to shoulder level."},
+        {"id":"legext2","icon":"row","name":"Machine Leg Extension","sets":2,"reps":"14/14","meta":"2 sets","weight":30,"gifUrl":"gifs/machine-leg-extension.gif","desc":"Back pad set so knees line up with the machine’s pivot. Sit back firmly, extend to straight without snapping the knees, control the lower."},
+        {"id":"kneeraise2","icon":"birddog","name":"Hanging Knee Raise","sets":2,"reps":"15/15","meta":"2 sets","gifUrl":"gifs/hanging-knee-raise.gif","desc":"Hang from the bar, raise your knees toward your chest under control — no swinging. Lower slowly back to a dead hang."},
+        {"id":"seatedrow2","icon":"row","name":"Cable Seated Row","sets":2,"reps":"15/15","meta":"2 sets","weight":105,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
       ]} },
-  { key:'fri', date:'2026-10-09', label:'Fri',
-    run: {"tag":"Runna","title":"Run — awaiting Runna","intensity":2,"blurb":"Zion was cancelled, so Friday is a normal run day. Runna hasn’t posted this one yet — do whatever it shows on your watch and log it here."},
+  { key:'fri', date:'2026-10-16', label:'Fri',
+    run: {"tag":"Runna","title":"Run — awaiting Runna","intensity":1,"blurb":"Runna hasn’t posted this one yet. If it shows a run on your watch, do that and log it here; otherwise a short, comfortable jog or walk for steps is plenty."},
+    strength: {"kind":"mobility","tag":"Mobility","title":"Pre-race leg mobility","intensity":0,"blurb":"Five easy stretches for the legs, about 5 minutes. Nothing aggressive — you’re loosening up, not gaining range.","items":[
+        {"id":"quad","icon":"standquad","name":"Standing Quad Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/1512.gif","desc":"Stand tall, pull one heel toward your glute with knees together, hips tucked. 30 seconds a side — a gentle pull, not a strain."},
+        {"id":"calf","icon":"wallcalf","name":"Wall Calf Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/1377.gif","desc":"Hands on a wall, back heel pressed down, back leg straight. Lean in until you feel the calf lengthen. 30 seconds a side."},
+        {"id":"ham","icon":"seatreach","name":"Seated Hamstring Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/1511.gif","desc":"Sit with one leg extended, hinge forward from the hips with a long spine. 30 seconds a side, no bouncing."},
+        {"id":"hipflex","icon":"kneel","name":"Kneeling Hip Flexor Stretch","dur":60,"meta":"30s each side","desc":"Half-kneel, tuck the pelvis under and shift forward until the front of the back hip stretches. Squeeze the glute on the kneeling side. 30 seconds a side."},
+        {"id":"itb","icon":"sidebend","name":"IT Band Side Stretch","dur":60,"meta":"30s each side","desc":"Cross one leg behind the other and lean away from the back leg, reaching the arm overhead. Feel it along the outer hip and thigh. 30 seconds a side."}
+      ]} },
+  { key:'sat', date:'2026-10-17', label:'Sat',
+    run: {"tag":"Runna","title":"Shakeout — awaiting Runna","intensity":1,"blurb":"Day before the race. Runna usually adds a short shakeout — if it shows on your watch, do exactly that. Otherwise 10–15 easy minutes, with 3–4 relaxed 20-second strides at the end if your legs feel springy. Skip the home circuit this week; it comes back after the race. Lay out your gear, hydrate, and sleep early."},
     strength: null },
-  { key:'sat', date:'2026-10-10', label:'Sat',
-    run: {"tag":"Runna","title":"Long Run — awaiting Runna","intensity":3,"blurb":"Zion was cancelled, so Saturday is a normal long-run day. Runna hasn’t posted it yet — follow what it shows on your watch and log it here."},
-    strength: {"kind":"strength","tag":"Home","title":"Home strength circuit","intensity":2,"blurb":"Your usual home circuit, back on the schedule now that Zion is off. Last Saturday every set landed; same weights and reps again. Tap ⇄ to slide it to Sunday if you’d rather not stack it on the long run.","items":[
-        {"id":"kbsquat","icon":"standquad","name":"Kettlebell Goblet Squat","sets":3,"reps":"12","meta":"3 × 12","weight":15,"gifUrl":"gifs/Kettlebell-goblet-squat.gif","desc":"Hold the kettlebell at your chest, elbows tucked. Sit down between your knees with a tall chest, drive up through the whole foot."},
-        {"id":"dbrdl","icon":"standquad","name":"Dumbbell Romanian Deadlift","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/dumbell-romanian-deadlift.gif","desc":"Soft knees, hips push back, dumbbells slide down the thighs with a flat back. Stand tall by squeezing the glutes. Once all three sets hit 15, move to the 15 lb dumbbells."},
-        {"id":"kbswing","icon":"standquad","name":"Kettlebell Swing","sets":3,"reps":"15","meta":"3 × 15","weight":15,"gifUrl":"gifs/Kettle_swing.gif","desc":"Hinge, don’t squat — snap the hips forward and let the bell float to chest height. Arms are just hooks."},
-        {"id":"bandpull","icon":"row","name":"Band Pull-Apart","sets":3,"reps":"15","meta":"3 × 15, band","gifUrl":"gifs/band-pull-apart.gif","desc":"Arms straight at chest height, pull the band apart by squeezing the shoulder blades together. Control it back."},
-        {"id":"glutebridge","icon":"birddog","name":"Single-Leg Glute Bridge","sets":3,"reps":"12","meta":"3 × 12/side, bodyweight","gifUrl":"gifs/glute-bridge.gif","desc":"One foot planted, other leg extended. Drive through the heel, hips level, squeeze at the top. Complete all reps each side."},
-        {"id":"ohtricep","icon":"press","name":"Overhead Dumbbell Triceps Extension","sets":3,"reps":"12","meta":"3 × 12","weight":10,"gifUrl":"gifs/Dumbbell-Triceps-Extension.gif","desc":"One dumbbell held overhead with both hands, elbows pointing forward. Lower behind the head, extend fully."},
-        {"id":"dbcurl","icon":"row","name":"Dumbbell Bicep Curl","sets":3,"reps":"20","meta":"3 × 20","weight":15,"gifUrl":"gifs/bicep-curl.gif","desc":"Elbows pinned to your sides, curl up, squeeze, lower slowly. 15 lb is your heaviest pair — once 20s feel easy, slow the lowering to 3 seconds."},
-        {"id":"deadhangcurl","icon":"row","name":"Dead-Hang Dumbbell Bicep Curl","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/deadhang-biceps-curl.gif","desc":"Let the arm hang fully straight at the bottom of every rep — pause there for a beat, then curl. No swinging."}
-      ]} },
-  { key:'sun', date:'2026-10-11', label:'Sun',
-    run: null,
-    strength: null,
-    restTitle: "Full rest", restBlurb: "Nothing scheduled — full recovery. Race week starts Monday; the gym pulls back then." },
+  { key:'sun', date:'2026-10-18', label:'Sun',
+    run: {"tag":"Race","title":"Race — Mission Inn Run 5K","intensity":3,"blurb":"3.1mi race at 6:55–7:10/mi (Runna’s target 7:05). Warm up 10 easy minutes plus 3–4 short strides. Start at the slow end — around 7:10 for the first mile — settle into 7:05, and only push in the last half mile. Your readiness, sleep and HRV are all in a good place going in. Log the result in the effort and notes fields."},
+    strength: null },
 ];
 
 // ── STORAGE (localStorage — this file is meant to be opened standalone
