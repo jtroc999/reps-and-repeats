@@ -197,7 +197,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v10.12.26.1</div>
+    <div class="version-tag">v10.16.26.1</div>
   </main>
 </div>
 
@@ -320,11 +320,11 @@ const PLAN = [
   { key:'fri', date:'2026-10-16', label:'Fri',
     run: {"tag":"Runna","title":"Run — awaiting Runna","intensity":1,"blurb":"Runna hasn’t posted this one yet. If it shows a run on your watch, do that and log it here; otherwise a short, comfortable jog or walk for steps is plenty."},
     strength: {"kind":"mobility","tag":"Mobility","title":"Pre-race leg mobility","intensity":0,"blurb":"Five easy stretches for the legs, about 5 minutes. Nothing aggressive — you’re loosening up, not gaining range.","items":[
-        {"id":"quad","icon":"standquad","name":"Standing Quad Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/1512.gif","desc":"Stand tall, pull one heel toward your glute with knees together, hips tucked. 30 seconds a side — a gentle pull, not a strain."},
-        {"id":"calf","icon":"wallcalf","name":"Wall Calf Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/1377.gif","desc":"Hands on a wall, back heel pressed down, back leg straight. Lean in until you feel the calf lengthen. 30 seconds a side."},
-        {"id":"ham","icon":"seatreach","name":"Seated Hamstring Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/1511.gif","desc":"Sit with one leg extended, hinge forward from the hips with a long spine. 30 seconds a side, no bouncing."},
-        {"id":"hipflex","icon":"kneel","name":"Kneeling Hip Flexor Stretch","dur":60,"meta":"30s each side","desc":"Half-kneel, tuck the pelvis under and shift forward until the front of the back hip stretches. Squeeze the glute on the kneeling side. 30 seconds a side."},
-        {"id":"itb","icon":"sidebend","name":"IT Band Side Stretch","dur":60,"meta":"30s each side","desc":"Cross one leg behind the other and lean away from the back leg, reaching the arm overhead. Feel it along the outer hip and thigh. 30 seconds a side."}
+        {"id":"quad","icon":"standquad","name":"Standing Quad Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/standing-quad-stretch.gif","desc":"Stand tall, pull one heel toward your glute with knees together, hips tucked. 30 seconds a side — a gentle pull, not a strain."},
+        {"id":"calf","icon":"wallcalf","name":"Wall Calf Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/wall-calf-stretch.gif","desc":"Hands on a wall, back heel pressed down, back leg straight. Lean in until you feel the calf lengthen. 30 seconds a side."},
+        {"id":"ham","icon":"seatreach","name":"Seated Hamstring Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/seated-hamstring-stretch.gif","desc":"Sit with one leg extended, hinge forward from the hips with a long spine. 30 seconds a side, no bouncing."},
+        {"id":"hipflex","icon":"kneel","name":"Kneeling Hip Flexor Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/kneeling-hip-flexor-stretch.gif","desc":"Half-kneel, tuck the pelvis under and shift forward until the front of the back hip stretches. Squeeze the glute on the kneeling side. 30 seconds a side."},
+        {"id":"itb","icon":"sidebend","name":"IT Band Side Stretch","dur":60,"meta":"30s each side","gifUrl":"gifs/it-band-side-stretch.gif","desc":"Cross one leg behind the other and lean away from the back leg, reaching the arm overhead. Feel it along the outer hip and thigh. 30 seconds a side."}
       ]} },
   { key:'sat', date:'2026-10-17', label:'Sat',
     run: {"tag":"Runna","title":"Shakeout — awaiting Runna","intensity":1,"blurb":"Day before the race. Runna usually adds a short shakeout — if it shows on your watch, do exactly that. Otherwise 10–15 easy minutes, with 3–4 relaxed 20-second strides at the end if your legs feel springy. Skip the home circuit this week; it comes back after the race. Lay out your gear, hydrate, and sleep early."},
