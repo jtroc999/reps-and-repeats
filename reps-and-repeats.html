@@ -197,7 +197,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v10.16.26.1</div>
+    <div class="version-tag">v10.16.26.2</div>
   </main>
 </div>
 
@@ -528,6 +528,19 @@ function init(){
 }
 
 function planOverrideKey(){ return 'rr-plan2-'+WEEK_START; } // v2 = run/strength parts format
+// The saved override stores only WHERE each part lives (which hardcoded
+// day it originally came from), never the part content itself. Content
+// (exercise lists, GIF paths, blurbs) always comes from the current
+// hardcoded PLAN, so redeploying new content is never masked by an old save.
+const BASE_PARTS = { run:{}, strength:{} }; // origin day key -> part object
+PLAN.forEach(d => { if(d.run) BASE_PARTS.run[d.key] = d.run; if(d.strength) BASE_PARTS.strength[d.key] = d.strength; });
+function originOf(part, kind){
+  if(!part) return null;
+  for(const k in BASE_PARTS[kind]) if(BASE_PARTS[kind][k] === part) return k;
+  // legacy saves hold full copies: match by title
+  for(const k in BASE_PARTS[kind]) if(BASE_PARTS[kind][k].title === part.title) return k;
+  return undefined;
+}
 function loadPlanOverride(){
   try{
     const saved = localStorage.getItem(planOverrideKey());
@@ -535,11 +548,24 @@ function loadPlanOverride(){
     const parsed = JSON.parse(saved);
     const sameShape = Array.isArray(parsed) && parsed.length === PLAN.length &&
       parsed.every((d, i) => d && d.key === PLAN[i].key && ('run' in d) && ('strength' in d));
-    if(sameShape) PLAN.splice(0, PLAN.length, ...parsed);
+    if(!sameShape) return;
+    const layout = parsed.map(d => ({
+      run: (d.run && typeof d.run === 'object') ? originOf(d.run, 'run') : (d.run || null),
+      strength: (d.strength && typeof d.strength === 'object') ? originOf(d.strength, 'strength') : (d.strength || null)
+    }));
+    // refuse the whole save if any part can't be traced to a current one
+    if(layout.some(l => l.run === undefined || l.strength === undefined)) return;
+    PLAN.forEach((d, i) => {
+      d.run = layout[i].run ? BASE_PARTS.run[layout[i].run] : null;
+      d.strength = layout[i].strength ? BASE_PARTS.strength[layout[i].strength] : null;
+    });
   }catch(e){}
 }
 function savePlanOverride(){
-  try{ localStorage.setItem(planOverrideKey(), JSON.stringify(PLAN)); }catch(e){}
+  try{
+    const out = PLAN.map(d => ({ key:d.key, run: originOf(d.run,'run'), strength: originOf(d.strength,'strength') }));
+    localStorage.setItem(planOverrideKey(), JSON.stringify(out));
+  }catch(e){}
 }
 
 let swapSourceKey = null;
