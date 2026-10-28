@@ -109,13 +109,15 @@ textarea{resize:vertical; min-height:52px;}
 .rb-bar span{display:block; min-width:3px;}
 .rb-t-warmup,.rb-t-cool{background:var(--slate);} .rb-t-easy{background:var(--green);}
 .rb-t-steady{background:var(--ochre);} .rb-t-work{background:var(--rust);} .rb-t-rest{background:var(--border2);}
-.rb-group{border:1px solid var(--border); border-radius:12px; margin:0 0 10px; overflow:hidden;}
+.rb-group{border:3px solid var(--rust); border-radius:14px; margin:12px 0; overflow:hidden; background:rgba(182,85,62,0.14);}
 .rb-ghead{display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:13px; font-weight:700; background:var(--rust); color:#fff;}
 .rb-ghead.plain{background:var(--border2); color:var(--text);}
 .rb-gcount{background:rgba(0,0,0,0.25); border:none; color:#fff; font-family:inherit; font-size:13px; font-weight:700; padding:4px 10px; border-radius:12px; cursor:pointer;}
 .rb-step{display:flex; justify-content:space-between; gap:10px; padding:12px; border-top:1px solid var(--border); background:var(--bg2); cursor:pointer;}
+.rb-group .rb-step{background:transparent; border-top:1px dashed rgba(182,85,62,0.5);}
 .rb-group .rb-step:first-of-type{border-top:none;}
 .rb-step.now{background:var(--bg3, #2a3224); box-shadow:inset 4px 0 0 var(--ochre);}
+.rb-group .rb-step.now{background:rgba(201,143,58,0.18);}
 .rb-step.done{opacity:0.38;}
 .rb-main{font-size:20px; font-weight:700; line-height:1.15;}
 .rb-main small{font-size:13px; font-weight:500; color:var(--text2); margin-left:6px;}
@@ -220,7 +222,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v10.28.26.1</div>
+    <div class="version-tag">v10.28.26.2</div>
   </main>
 </div>
 
