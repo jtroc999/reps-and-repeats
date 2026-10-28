@@ -101,6 +101,29 @@ main{padding-top:14px;}
 input[type=number],textarea{width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:10px 12px; color:var(--text); font-family:inherit; font-size:14px;}
 textarea{resize:vertical; min-height:52px;}
 
+/* ── Run breakdown ── */
+.rb-card{background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:12px; margin:0 0 14px; cursor:pointer;}
+.rb-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-size:12px; color:var(--text2);}
+.rb-open{color:var(--ochre); font-weight:600;}
+.rb-bar{display:flex; gap:2px; height:14px; border-radius:4px; overflow:hidden;}
+.rb-bar span{display:block; min-width:3px;}
+.rb-t-warmup,.rb-t-cool{background:var(--slate);} .rb-t-easy{background:var(--green);}
+.rb-t-steady{background:var(--ochre);} .rb-t-work{background:var(--rust);} .rb-t-rest{background:var(--border2);}
+.rb-group{border:1px solid var(--border); border-radius:12px; margin:0 0 10px; overflow:hidden;}
+.rb-ghead{display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:13px; font-weight:700; background:var(--rust); color:#fff;}
+.rb-ghead.plain{background:var(--border2); color:var(--text);}
+.rb-gcount{background:rgba(0,0,0,0.25); border:none; color:#fff; font-family:inherit; font-size:13px; font-weight:700; padding:4px 10px; border-radius:12px; cursor:pointer;}
+.rb-step{display:flex; justify-content:space-between; gap:10px; padding:12px; border-top:1px solid var(--border); background:var(--bg2); cursor:pointer;}
+.rb-group .rb-step:first-of-type{border-top:none;}
+.rb-step.now{background:var(--bg3, #2a3224); box-shadow:inset 4px 0 0 var(--ochre);}
+.rb-step.done{opacity:0.38;}
+.rb-main{font-size:20px; font-weight:700; line-height:1.15;}
+.rb-main small{font-size:13px; font-weight:500; color:var(--text2); margin-left:6px;}
+.rb-target{font-size:17px; font-weight:600; color:var(--ochre); margin-top:3px;}
+.rb-sub{font-size:12px; color:var(--text2); margin-top:2px;}
+.rb-kind{font-size:11px; letter-spacing:1.2px; font-weight:700; color:var(--text3); align-self:center;}
+.rb-total{font-size:12px; color:var(--text2); margin:0 0 12px;}
+.rb-reset{background:none; border:1px solid var(--border2); color:var(--text2); border-radius:8px; padding:8px; width:100%; font-family:inherit; font-size:12px; margin-top:6px; cursor:pointer;}
 .btn{width:100%; padding:13px; border:none; border-radius:9px; font-family:'Work Sans',sans-serif; font-size:14px; font-weight:600; cursor:pointer; margin-top:14px;}
 .btn-primary{background:var(--ochre); color:var(--bg);}
 .btn-done{background:var(--green); color:var(--bg);}
@@ -197,7 +220,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v10.26.26.1</div>
+    <div class="version-tag">v10.28.26.1</div>
   </main>
 </div>
 
@@ -216,6 +239,15 @@ textarea{resize:vertical; min-height:52px;}
     <div id="modal-weight-area"></div>
     <div id="modal-reps-area"></div>
     <div class="modal-desc" id="modal-desc"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="run-modal" onclick="if(event.target===this) closeRunModal()">
+  <div class="modal-sheet">
+    <div class="modal-top"><button class="modal-close" onclick="closeRunModal()">&#10005;</button></div>
+    <div class="modal-title" id="run-modal-title"></div>
+    <div class="modal-meta" id="run-modal-meta"></div>
+    <div id="run-modal-body"></div>
   </div>
 </div>
 
@@ -306,7 +338,7 @@ const CORE = [
 const WEEK_START = '2026-10-26';
 const PLAN = [
   { key:'mon', date:'2026-10-26', label:'Mon',
-    run: {"tag":"Runna","title":"Easy Run — 3.75mi","intensity":1,"blurb":"Post Race Recovery Plan (Week 2/2). 3.75mi easy run at a conversational pace — no faster than 9:05/mi. That is a ceiling, not a target. Your last three easy runs came in around 8:05–8:15/mi, about a minute quicker than the cap, with training status still Strained — hold to the cap or slower today."},
+    run: {"tag":"Runna","title":"Easy Run — 3.75mi","intensity":1,"blurb":"Post Race Recovery Plan (Week 2/2). 3.75mi easy run at a conversational pace — no faster than 9:05/mi. That is a ceiling, not a target. Your last three easy runs came in around 8:05–8:15/mi, about a minute quicker than the cap, with training status still Strained — hold to the cap or slower today.","segments":[{"type":"easy","label":"Easy run","dist":3.75,"cap":"9:05","note":"A ceiling, not a target"}]},
     strength: null },
   { key:'tue', date:'2026-10-27', label:'Tue',
     run: null,
@@ -321,7 +353,7 @@ const PLAN = [
         {"id":"seatedrow","icon":"row","name":"Cable Seated Row","sets":3,"reps":"12/12/12","meta":"3 sets","weight":120,"gifUrl":"gifs/cable-seated-row.gif","desc":"Feet on the foot plates, chest up, pull the handles to the lower torso, squeeze the shoulder blades together, control the return."}
       ]} },
   { key:'wed', date:'2026-10-28', label:'Wed',
-    run: {"tag":"Runna","title":"Intervals — 400m Repeats","intensity":3,"blurb":"Post Race Recovery Plan (Week 2/2). 1.25mi warm up at a conversational pace (no faster than 9:10/mi), 90s walking rest. Then 6 reps of 0.25mi at 6:45/mi (6:30–7:00/mi) with 60s walking rest between. Finish with a 0.5mi cool down at a conversational pace or slower. Short and sharp — stop at 6 reps even if you feel great."},
+    run: {"tag":"Runna","title":"Intervals — 400m Repeats","intensity":3,"blurb":"Post Race Recovery Plan (Week 2/2). 1.25mi warm up at a conversational pace (no faster than 9:10/mi), 90s walking rest. Then 6 reps of 0.25mi at 6:45/mi (6:30–7:00/mi) with 60s walking rest between. Finish with a 0.5mi cool down at a conversational pace or slower. Short and sharp — stop at 6 reps even if you feel great.","segments":[{"type":"warmup","label":"Warm-up","dist":1.25,"cap":"9:10","note":"Conversational pace"},{"type":"rest","label":"Walking rest","dur":90},{"repeat":6,"steps":[{"type":"work","label":"Fast","dist":0.25,"pace":"6:45","range":["6:30","7:00"],"mph":"8.9","mphRange":["8.7","9.1"]},{"type":"rest","label":"Walking rest","dur":60}]},{"type":"cool","label":"Cool down","dist":0.5,"note":"Conversational pace or slower"}]},
     strength: null },
   { key:'thu', date:'2026-10-29', label:'Thu',
     run: null,
@@ -340,7 +372,7 @@ const PLAN = [
     strength: null,
     restTitle: "Easy day", restBlurb: "Runna has no run today. An easy walk for your step goal is plenty, plus the plank challenge as usual. Rest here sets up Saturday’s long run." },
   { key:'sat', date:'2026-10-31', label:'Sat',
-    run: {"tag":"Runna","title":"Long Run — 4mi","intensity":2,"blurb":"Post Race Recovery Plan (Week 2/2). 4mi at a conversational pace. Outdoors if the weather is nice; this is a good day to start mixing in some outside miles. The home circuit follows."},
+    run: {"tag":"Runna","title":"Long Run — 4mi","intensity":2,"blurb":"Post Race Recovery Plan (Week 2/2). 4mi at a conversational pace. Outdoors if the weather is nice; this is a good day to start mixing in some outside miles. The home circuit follows.","segments":[{"type":"easy","label":"Long run, conversational","dist":4,"note":"Easy effort — if you can’t chat, slow down"}]},
     strength: {"kind":"strength","tag":"Home","title":"Home strength circuit","intensity":2,"blurb":"Your usual home circuit, same weights and targets as last Saturday (every set landed). Do it after the 4mi long run, or later in the day if the legs want a break first.","items":[
         {"id":"kbsquat","icon":"standquad","name":"Kettlebell Goblet Squat","sets":3,"reps":"12","meta":"3 × 12","weight":15,"gifUrl":"gifs/Kettlebell-goblet-squat.gif","desc":"Hold the kettlebell at your chest, elbows tucked. Sit down between your knees with a tall chest, drive up through the whole foot."},
         {"id":"dbrdl","icon":"standquad","name":"Dumbbell Romanian Deadlift","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/dumbell-romanian-deadlift.gif","desc":"Soft knees, hips push back, dumbbells slide down the thighs with a flat back. Stand tall by squeezing the glutes. Once all three sets hit 15, move to the 15 lb dumbbells."},
@@ -352,7 +384,7 @@ const PLAN = [
         {"id":"deadhangcurl","icon":"row","name":"Dead-Hang Dumbbell Bicep Curl","sets":3,"reps":"12","meta":"3 × 12","weight":12,"gifUrl":"gifs/deadhang-biceps-curl.gif","desc":"Let the arm hang fully straight at the bottom of every rep — pause there for a beat, then curl. No swinging."}
       ]} },
   { key:'sun', date:'2026-11-01', label:'Sun',
-    run: {"tag":"Runna","title":"Easy Run #2 — 3mi","intensity":1,"blurb":"Post Race Recovery Plan (Week 2/2). 3mi easy run at a conversational pace — no faster than 9:05/mi. This is the last Runna session before the Claude-planned runs start Monday Nov 2; tonight we plan week 1 for the Run for A Claus 5K."},
+    run: {"tag":"Runna","title":"Easy Run #2 — 3mi","intensity":1,"blurb":"Post Race Recovery Plan (Week 2/2). 3mi easy run at a conversational pace — no faster than 9:05/mi. This is the last Runna session before the Claude-planned runs start Monday Nov 2; tonight we plan week 1 for the Run for A Claus 5K.","segments":[{"type":"easy","label":"Easy run","dist":3,"cap":"9:05","note":"A ceiling, not a target"}]},
     strength: null },
 ];
 
@@ -638,6 +670,123 @@ function swapDays(keyA, keyB){
 // ── WEEK STRIP ────────────────────────────────────────────
 // ── MOVE A PART (run / strength) BETWEEN DAYS ─────────────
 let moveCtx = null; // {fromKey, part}
+// ── RUN BREAKDOWN ─────────────────────────────────────────
+// run.segments is an ordered list of steps; a step is either
+//   {type:'warmup|easy|steady|work|rest|cool', label, dist:<mi> | dur:<sec>,
+//    pace:'6:45' (target), range:['6:30','7:00'], cap:'9:10' (no faster than),
+//    mph/mphRange (optional overrides), note}
+// or a repeat group {repeat:N, steps:[...]}. Speeds are shown in both
+// min/mi and treadmill mph. Progress (which steps are done) is stored per
+// day in log.runProg and is only a visual aid while running.
+function paceToMph(p){
+  const m = /^(\d+):(\d{2})$/.exec(p||''); if(!m) return '';
+  return (60 / (+m[1] + (+m[2])/60)).toFixed(1);
+}
+function segFlat(segs){
+  const out = [];
+  (segs||[]).forEach((g,gi)=>{
+    if(g.repeat) g.steps.forEach((st,si)=>out.push({st, gi, si, rep:g.repeat}));
+    else out.push({st:g, gi, si:0, rep:1});
+  });
+  return out;
+}
+function segMiles(st){ return st.dist || 0; }
+function runTotals(segs){
+  let mi = 0;
+  (segs||[]).forEach(g=>{
+    if(g.repeat) mi += g.repeat * g.steps.reduce((a,x)=>a+segMiles(x),0);
+    else mi += segMiles(g);
+  });
+  return mi;
+}
+function segWeight(st){ return st.dist ? st.dist : Math.max(0.04, (st.dur||30)/600); }
+function segIsDone(log, g, gi){
+  const n = (log.runProg||{})[gi] || 0;
+  return n >= (g.repeat || 1);
+}
+function firstOpenGroup(day, log){
+  const segs = day.run.segments;
+  for(let i=0;i<segs.length;i++) if(!segIsDone(log, segs[i], i)) return i;
+  return -1;
+}
+function stepTargetHtml(st){
+  let t = '', sub = [];
+  if(st.type === 'rest') return {t:'', sub:''};
+  if(st.cap){
+    const mph = st.mph || paceToMph(st.cap);
+    t = 'No faster than '+st.cap+'/mi'+(mph?' \u00b7 '+mph+' mph':'');
+  } else if(st.pace){
+    const mph = st.mph || paceToMph(st.pace);
+    t = st.pace+'/mi'+(mph?' \u00b7 '+mph+' mph':'');
+    if(st.range){
+      const lo = st.mphRange ? st.mphRange[1] : paceToMph(st.range[0]);
+      const hi = st.mphRange ? st.mphRange[0] : paceToMph(st.range[1]);
+      const mlo = st.mphRange ? st.mphRange[0] : paceToMph(st.range[1]);
+      const mhi = st.mphRange ? st.mphRange[1] : paceToMph(st.range[0]);
+      sub.push('Range '+st.range[0]+'\u2013'+st.range[1]+'/mi \u00b7 '+mlo+'\u2013'+mhi+' mph');
+    }
+  }
+  if(st.note) sub.push(st.note);
+  return {t, sub: sub.join(' \u00b7 ')};
+}
+function stepHtml(st, cls, onclick){
+  const big = st.dist ? (st.dist+' mi') : (st.dur>=120 ? (Math.round(st.dur/6)/10+' min') : (st.dur+' s'));
+  const tg = stepTargetHtml(st);
+  return '<div class="rb-step '+cls+'" onclick="'+onclick+'"><div>'+
+    '<div class="rb-main">'+big+'<small>'+st.label+'</small></div>'+
+    (tg.t ? '<div class="rb-target">'+tg.t+'</div>' : '')+
+    (tg.sub ? '<div class="rb-sub">'+tg.sub+'</div>' : '')+
+    '</div><div class="rb-kind">'+(st.type==='rest'?'REST':'RUN')+'</div></div>';
+}
+function runBreakdownCardHtml(day){
+  const segs = day.run && day.run.segments;
+  if(!segs || !segs.length) return '';
+  const total = runTotals(segs);
+  const bars = [];
+  segs.forEach(g=>{
+    const reps = g.repeat || 1, steps = g.repeat ? g.steps : [g];
+    for(let r=0;r<reps;r++) steps.forEach(st=>bars.push('<span class="rb-t-'+st.type+'" style="flex:'+segWeight(st)+'"></span>'));
+  });
+  return '<div class="rb-card" onclick="openRunModal(\''+day.key+'\')">'+
+    '<div class="rb-top"><span>Run breakdown \u00b7 '+(Math.round(total*100)/100)+' mi</span><span class="rb-open">Open \u203a</span></div>'+
+    '<div class="rb-bar">'+bars.join('')+'</div></div>';
+}
+let runModalKey = null;
+function openRunModal(key){ runModalKey = key; renderRunModal(); document.getElementById('run-modal').classList.add('open'); }
+function closeRunModal(){ document.getElementById('run-modal').classList.remove('open'); runModalKey = null; }
+function renderRunModal(){
+  const day = PLAN.find(d=>d.key===runModalKey); if(!day || !day.run) return;
+  const log = logs[day.date]; const segs = day.run.segments || [];
+  const open = firstOpenGroup(day, log);
+  document.getElementById('run-modal-title').textContent = day.run.title;
+  document.getElementById('run-modal-meta').textContent = 'Tap a step to check it off while you run.';
+  let html = '<div class="rb-total">Total '+(Math.round(runTotals(segs)*100)/100)+' mi plus walking rests</div>';
+  segs.forEach((g,gi)=>{
+    const done = segIsDone(log, g, gi), now = gi === open;
+    if(g.repeat){
+      const n = (log.runProg||{})[gi] || 0;
+      html += '<div class="rb-group"><div class="rb-ghead"><span>\u21bb Repeat \u00d7'+g.repeat+'</span>'+
+        '<button class="rb-gcount" onclick="event.stopPropagation();bumpRunStep('+gi+',1)">Rep '+Math.min(n+(done?0:1), g.repeat)+' of '+g.repeat+(done?' \u2713':' \u00b7 tap when done')+'</button></div>'+
+        g.steps.map(st=>stepHtml(st, done?'done':(now?'now':''), 'bumpRunStep('+gi+',1)')).join('')+'</div>';
+    } else {
+      html += stepHtml(g, done?'done':(now?'now':''), 'bumpRunStep('+gi+', '+(done?-1:1)+')');
+    }
+  });
+  html += '<button class="rb-reset" onclick="resetRunProg()">Reset progress</button>';
+  document.getElementById('run-modal-body').innerHTML = html;
+}
+function bumpRunStep(gi, delta){
+  const day = PLAN.find(d=>d.key===runModalKey); if(!day) return;
+  const log = logs[day.date]; log.runProg = log.runProg || {};
+  const g = day.run.segments[gi], max = g.repeat || 1;
+  log.runProg[gi] = Math.max(0, Math.min(max, (log.runProg[gi]||0) + delta));
+  saveLog(day.date, log); renderRunModal();
+}
+function resetRunProg(){
+  const day = PLAN.find(d=>d.key===runModalKey); if(!day) return;
+  const log = logs[day.date]; log.runProg = {}; saveLog(day.date, log); renderRunModal();
+}
+
 function partHeadHtml(day, part, label){
   return '<div class="part-head"><span class="part-lbl">'+label+'</span>'+
     '<button class="part-move" onclick="openMoveModal(\''+day.key+'\',\''+part+'\')">Move \u21c4</button></div>';
@@ -1021,22 +1170,27 @@ function completeTimedItem(dateKey, itemId, kind, rowId){
     if(item) renderModalTimer(dateKey, itemId, item, kind);
   }
 
-  if(kind === 'core'){
-    // Cascade straight into the next move in the 5-Minute Plank
-    // Challenge — no rest, no extra tap needed, matching how the
-    // routine is actually meant to run.
-    const idx = CORE.findIndex(i=>i.id===itemId);
-    if(idx >= 0 && idx+1 < CORE.length){
-      const next = CORE[idx+1];
+  if(kind === 'core' || kind === 'cool'){
+    // Cascade straight into the next move — the 5-Minute Plank Challenge
+    // and the post-run stretch both run back to back, no rest, no extra
+    // tap needed. For the stretch, skip any move already checked off.
+    const list = kind === 'core' ? CORE : COOLDOWN;
+    let idx = list.findIndex(i=>i.id===itemId) + 1;
+    if(kind === 'cool'){
+      const bucket2 = bucketFor(log, 'cool');
+      while(idx < list.length && bucket2[list[idx].id]) idx++;
+    }
+    if(idx > 0 && idx < list.length){
+      const next = list[idx];
       if(wasShowingThis){
         // Follow the cascade in the modal too, so watching it play out
         // doesn't require swiping along with it.
-        const newIdx = navList.findIndex(e=>e.itemId===next.id && e.kind==='core');
+        const newIdx = navList.findIndex(e=>e.itemId===next.id && e.kind===kind);
         if(newIdx>=0) navIndex = newIdx;
-        modalCtx = {dateKey, itemId:next.id, kind:'core'};
+        modalCtx = {dateKey, itemId:next.id, kind};
       }
       setTimeout(()=>{
-        startItemTimer(dateKey, next.id, next.dur, 'core');
+        startItemTimer(dateKey, next.id, next.dur, kind);
         if(wasShowingThis) renderModalContent();
       }, 250);
       return; // skip the rest chip — we're chaining straight through
@@ -1322,7 +1476,7 @@ function renderDayBody(key){
   const log = logs[day.date];
   const body = document.getElementById('body-'+key);
   let html = '';
-  if(day.run){ html += partHeadHtml(day, 'run', day.run.label || 'Run') + '<div class="blurb">'+day.run.blurb+'</div>'; }
+  if(day.run){ html += partHeadHtml(day, 'run', day.run.label || 'Run') + '<div class="blurb">'+day.run.blurb+'</div>' + runBreakdownCardHtml(day); }
   if(day.strength){
     html += partHeadHtml(day, 'strength', day.strength.kind === 'mobility' ? 'Mobility' : 'Strength') +
       '<div class="blurb">'+day.strength.blurb+'</div>';
