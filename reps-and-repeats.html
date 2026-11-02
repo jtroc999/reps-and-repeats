@@ -222,7 +222,7 @@ textarea{resize:vertical; min-height:52px;}
       <button class="btn-backup" onclick="document.getElementById('restore-file').click()">Restore from backup</button>
       <input type="file" id="restore-file" accept="application/json" style="display:none;" onchange="restoreData(event)">
     </div>
-    <div class="version-tag">v11.01.26.2</div>
+    <div class="version-tag">v11.02.26.1</div>
   </main>
 </div>
 
@@ -293,6 +293,7 @@ armraise:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--slate)" stroke-widt
 obliquecrunch:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--slate)" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="32" r="5"/><path d="M17 33h30"/><path d="M17 33l-3 12"/><path d="M47 33l6 12"/><path d="M32 33l8-10"/></svg>`,
 walk:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--ochre)" stroke-width="3" stroke-linecap="round"><circle cx="30" cy="10" r="5"/><path d="M30 15v14"/><path d="M30 20l-9 5M30 20l8-3"/><path d="M30 29l-8 20M30 29l7 8-2 12"/></svg>`,
 run:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--ochre)" stroke-width="3" stroke-linecap="round"><circle cx="32" cy="9" r="5"/><path d="M32 14l-4 12"/><path d="M28 26l-13-3M28 26l12 6"/><path d="M28 26l-6 20M40 32l4 16"/></svg>`,
+calfraise:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--slate)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="9" r="4.5"/><path d="M30 14v18M30 19l-8 8M30 19l8 8M30 32l-4 15M30 32l4 15M26 47l-3 5M34 47l3 5M16 40l-3-4 3-4M44 40l3-4-3-4"/></svg>`,
 moon:`<svg viewBox="0 0 60 60" fill="none" stroke="var(--text3)" stroke-width="3" stroke-linecap="round"><path d="M38 12a18 18 0 1 0 10 26 14 14 0 0 1 -10-26z" fill="none"/></svg>`,
 };
 function iconSvg(id){ return ICONS[id] || ICONS.moon; }
@@ -301,6 +302,12 @@ function iconSvg(id){ return ICONS[id] || ICONS.moon; }
 // Shown at the end of every day that has a run part. Items are timed like
 // the other stretches; each "meta" says how long per side (the timer covers
 // both sides plus the switch).
+// ── DAILY CALF RAISES ─────────────────────────────
+// One 2-minute timed item shown on every day, like the plank challenge.
+const DAILY = [
+  { id:'daily-calf', name:'Calf Raises', icon:'calfraise', dur:120, meta:'2 minutes',
+    desc:'Stand tall (a hand on a wall for balance is fine), rise onto the balls of both feet, pause a beat at the top, then lower slowly. Smooth, steady reps for the full two minutes. Make it harder by going one leg at a time or off the edge of a step.' }
+];
 const COOLDOWN_VIDEO = 'https://youtu.be/T2MDtNq62sI';
 const COOLDOWN = [
   { id:'cd-ham', name:'Hamstring Stretch', icon:'seatreach', dur:45, meta:'20s each side',
@@ -462,13 +469,14 @@ function fmtShort(dateStr){
   return new Date(dateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 // Timed-item blocks that live outside a day's own items.
-function timedListFor(kind){ return kind==='core' ? CORE : (kind==='cool' ? COOLDOWN : null); }
+function timedListFor(kind){ return kind==='core' ? CORE : (kind==='cool' ? COOLDOWN : (kind==='daily' ? DAILY : null)); }
 function bucketFor(log, kind){
   if(kind==='core') return log.coreSets;
   if(kind==='cool'){ if(!log.coolSets) log.coolSets = {}; return log.coolSets; }
+  if(kind==='daily'){ if(!log.dailySets) log.dailySets = {}; return log.dailySets; }
   return log.sets;
 }
-function emptyLog(){ return { done:false, sets:{}, coreSets:{}, coolSets:{}, weights:{}, reps:{}, setCounts:{}, distance:'', effort:null, notes:'' }; }
+function emptyLog(){ return { done:false, sets:{}, coreSets:{}, coolSets:{}, dailySets:{}, weights:{}, reps:{}, setCounts:{}, distance:'', effort:null, notes:'' }; }
 
 // ── PLAN PARTS (pure logic — unit-tested separately) ──────
 // A day is made of up to two independently movable parts: a `run` and a
@@ -1206,7 +1214,7 @@ function completeTimedItem(dateKey, itemId, kind, rowId){
 function restDurFor(kind){
   // The 5-Minute Plank Challenge is meant to run straight through with no
   // rest between moves, regardless of whatever the day's rest setting is.
-  return (kind === 'core' || kind === 'cool') ? 0 : restDur;
+  return (kind === 'core' || kind === 'cool' || kind === 'daily') ? 0 : restDur;
 }
 
 function showRestChip(rowId, kind){
@@ -1249,6 +1257,7 @@ function iconMotionClass(iconId){ return HOLD_ICONS.has(iconId) ? 'icon-anim-hol
 function findItem(dateKey, itemId, kind){
   if(kind==='core') return CORE.find(i=>i.id===itemId);
   if(kind==='cool') return COOLDOWN.find(i=>i.id===itemId);
+  if(kind==='daily') return DAILY.find(i=>i.id===itemId);
   const day = PLAN.find(d=>d.date===dateKey);
   return day ? day.items.find(i=>i.id===itemId) : null;
 }
@@ -1264,6 +1273,7 @@ function buildNavList(dateKey){
     day.items.forEach(i => list.push({dateKey, itemId:i.id, kind:dayItemKind}));
   }
   if(day && day.run) COOLDOWN.forEach(i => list.push({dateKey, itemId:i.id, kind:'cool'}));
+  DAILY.forEach(i => list.push({dateKey, itemId:i.id, kind:'daily'}));
   CORE.forEach(i => list.push({dateKey, itemId:i.id, kind:'core'}));
   return list;
 }
@@ -1460,7 +1470,7 @@ function saveWeight(dateKey, itemId, value){
   saveLog(dateKey, log);
   // Update the row's meta text live without a full re-render
   const day = PLAN.find(d=>d.date===dateKey);
-  const dayItem = (day && day.items ? day.items.find(i=>i.id===itemId) : null) || CORE.find(i=>i.id===itemId) || COOLDOWN.find(i=>i.id===itemId);
+  const dayItem = (day && day.items ? day.items.find(i=>i.id===itemId) : null) || CORE.find(i=>i.id===itemId) || COOLDOWN.find(i=>i.id===itemId) || DAILY.find(i=>i.id===itemId);
   if(dayItem){
     const metaEl = document.getElementById('meta-'+dateKey+'-'+itemId);
     if(metaEl) metaEl.textContent = displayMeta(dateKey, dayItem);
@@ -1498,6 +1508,10 @@ function renderDayBody(key){
     html += '<div class="section-lbl">Post-run stretch \u00b7 <a href="'+COOLDOWN_VIDEO+'" target="_blank" rel="noopener" style="color:var(--ochre);">watch video</a></div>';
     html += COOLDOWN.map(it=>exRowHtml(day.date, it, 'cool')).join('');
   }
+
+  // Daily calf raises — every day
+  html += '<div class="section-lbl">Daily \u2014 Calf raises (2 min)</div>';
+  html += DAILY.map(it=>exRowHtml(day.date, it, 'daily')).join('');
 
   // Daily core block — every day, per your request
   html += '<div class="section-lbl">Core \u2014 5-Minute Plank Challenge</div>';
